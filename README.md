@@ -9,7 +9,7 @@ Loads configuration from JSON files from a [app_root]/config directory. The load
 npm install exp-config
 ```
 
-Create file named development.json in a folder named config in the application's root directory, such as:
+Create a file named development.json in a folder named config in the application's root directory, such as:
 
 ```json
 {
@@ -17,7 +17,7 @@ Create file named development.json in a folder named config in the application's
 }
 ```
 
-In your code require exp-config an retrieve the configuration value:
+In your code require exp-config and retrieve the configuration value:
 
 
 ```javascript
@@ -48,7 +48,7 @@ By default exp-config loads [app_root]/config/development.json. This behavior is
 $ NODE_ENV=production node app 
 ```
 
-When starting an application in this way exp-config will instead load [app_root]/config/production.json. Likewise, it's common have a separate configuration file for tests, and using NODE_ENV=test when running them.
+When starting an application in this way exp-config will instead load [app_root]/config/production.json. Likewise, it's common to have a separate configuration file for tests, and using NODE_ENV=test when running them.
 
 ## Overriding configuration values
 
@@ -64,6 +64,7 @@ It's also possible to override configuration by specifying them as environment v
 ```
 $ someProp=value node app
 ```
+
 
 ### Precedence and values in tests
 
