@@ -1,0 +1,7 @@
+{
+  "prop": "value",
+  "level1": {
+    "level2": "nested value"
+  },
+  "overridden": "from development.json"
+}

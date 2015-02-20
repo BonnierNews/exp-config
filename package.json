@@ -1,0 +1,35 @@
+{
+  "name": "exp-config",
+  "description": "Simple configuration management",
+  "version": "1.0.0",
+  "author": "AB Kvällstidningen Expressen",
+  "contributors": [
+    "Gabriel Falkenberg <gabriel.falkenberg@gmail.com>",
+    "Jens Carlén",
+    "Joel Abrahamsson <mail@joelabrahamsson.com>"
+  ],
+  "scripts": {
+    "test": "mocha --reporter spec && jshint ."
+  },
+  "main": "index.js",
+  "repository": "git://github.com/ExpressenAB/exp-config.git",
+  "keywords": [
+    "configuration"
+  ],
+  "license": {
+    "type": "MIT",
+    "url": "http://github.com/ExpressenAB/exp-config/raw/master/LICENSE"
+  },
+  "dependencies": {
+    "dotenv": "~0.5.1"
+  },
+  "devDependencies": {
+    "mocha": "~2.1.0",
+    "chai": "~2.0.0",
+    "jshint": "~2.6.0"
+  },
+  "files": [
+    "index.js",
+    "LICENSE"
+  ]
+}
