@@ -1,7 +1,7 @@
 exp-config
 =========
 
-Loads configuration from JSON files from a [app_root]/config directory. The loaded configuration file can differ depending on the environment (determined by the NODE_ENV environment variable). It's also possible to override configuration values using a file named .env in [app_root] and by specifying them as environment variables.
+Loads configuration from JSON files from a `<app_root>/config` directory. The loaded configuration file can differ depending on the environment (determined by the NODE_ENV environment variable). It's also possible to override configuration values using a file named .env in `<app_root>` and by specifying them as environment variables.
 
 ## Basic usage
 
@@ -42,7 +42,7 @@ var configuredValue = config.server.host;
 
 ## Different configuration files for different environments
 
-By default exp-config loads [app_root]/config/development.json. This behavior is typically used for local development and changed by specifying a different environment using the NODE_ENV environment variable, like this:
+By default exp-config loads `<app_root>/config/development.json`. This behavior is typically used for local development and changed by specifying a different environment using the NODE_ENV environment variable, like this:
 
 ```
 $ NODE_ENV=production node app 
@@ -52,7 +52,7 @@ When starting an application in this way exp-config will instead load [app_root]
 
 ## Overriding configuration values
 
-Individual values in the loaded configuration can be overridden by placing a file named .env in the application's root ([app_root]/.env). An example .env file can look like this:
+Individual values in the loaded configuration can be overridden by placing a file named .env in the application's root (`<app_root>/.env`). An example .env file can look like this:
 
 ```
 someProp=some other value
@@ -68,13 +68,13 @@ $ someProp=value node app
 
 ### Precedence and values in tests
 
-Values are loaded in the following order:
+Values are loaded with the following precedence:
 
 1. Environment variable
 2. .env file
 3. Configuration file
 
-In other words, environment variables take precedence before .env files and configuration files. However, there is one exception. When NODE_ENV equals test (NODE_ENV=test) environment variables and .env files are ignored.
+In other words, environment variables take precedence over .env files and configuration files. However, there is one exception. When NODE_ENV equals test (NODE_ENV=test) environment variables and .env files are ignored.
 
 ## Specifying the root folder
 
