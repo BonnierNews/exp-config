@@ -11,7 +11,7 @@ describe("config", function() {
     delete require.cache[require.resolve("../config/development")];
     delete require.cache[require.resolve("../config/test")];
   });
-  
+
   it("by default retrives values from properties in development.json", function() {
     require("../index").should.have.property("prop").equal("value");
   });
@@ -72,6 +72,22 @@ describe("config", function() {
     var config = require("../index");
     config.should.have.property("prop").equal("from custom");
     config.should.have.property("overridden").equal("from .env");
+    delete process.env.NODE_ENV;
+    delete process.env.overridden;
+  });
+
+  it("supports a default.json for default config", function () {
+    process.env.NODE_ENV = "development";
+    process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
+    // create default config file
+    var originalPath = path.join(__dirname, "../config/default.json");
+    var tempPath = path.join(__dirname, "../tmp/config/default.json");
+    fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+    // init config
+    var config = require("../index");
+    config.prop.should.eql("from custom");
+    config.overridden.should.eql("from .env");
+    config.newProp.should.eql(true);
   });
 });
 

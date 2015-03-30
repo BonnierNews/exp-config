@@ -1,0 +1,5 @@
+{
+  "prop": "default",
+  "newProp": true,
+  "overridden": "from default.json"
+}

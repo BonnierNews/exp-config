@@ -1,10 +1,22 @@
 var fs = require("fs");
 var path = require("path");
 var dotenv = require("dotenv");
+var _ = require("lodash");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
+var defaultConfig = {};
 var config = require(path.join(basePath, "config", envName));
+
+function applyDefault(config) {
+  try {
+    var hasDefaultConf = fs.statSync(path.join(basePath, "config", "default.json"));
+    if (hasDefaultConf.isFile()) {
+      defaultConfig = require(path.join(basePath, "config", "default.json"));
+    }
+  } catch (e) {}
+  return _.assign({}, defaultConfig, config);
+}
 
 function expandPath(name) {
   var current = config;
@@ -26,6 +38,8 @@ function setConfig(name, value) {
   var expanded = expandPath(name);
   expanded.current[expanded.last] = value;
 }
+
+config = applyDefault(config);
 
 if (envName !== "test") {
   // Config from .env file have precedence over environment json config
