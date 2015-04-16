@@ -1,6 +1,8 @@
 exp-config
 =========
 
+[![Build Status](https://travis-ci.org/ExpressenAB/exp-config.svg?branch=master)](https://travis-ci.org/ExpressenAB/exp-config)
+
 Loads configuration from JSON files from a `<app_root>/config` directory. The loaded configuration file can differ depending on the environment (determined by the `NODE_ENV` environment variable). It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
 
 ## Basic usage
@@ -57,7 +59,7 @@ If you just use `config.flags.someFlag` to prevent the string `"false"` (which i
 By default exp-config loads `<app_root>/config/development.json`. This behavior is typically used for local development and changed by specifying a different environment using the `NODE_ENV` environment variable, like this:
 
 ```
-$ NODE_ENV=production node app 
+$ NODE_ENV=production node app
 ```
 
 When starting an application in this way `exp-config` will instead load `<app_root>/config/production.json`. Likewise, it's common to have a separate configuration file for tests, and using `NODE_ENV=test` when running them.
