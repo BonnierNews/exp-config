@@ -3,7 +3,9 @@ exp-config
 
 [![Build Status](https://travis-ci.org/ExpressenAB/exp-config.svg?branch=master)](https://travis-ci.org/ExpressenAB/exp-config)
 
-Loads configuration from JSON files from a `<app_root>/config` directory. The loaded configuration file can differ depending on the environment (determined by the `NODE_ENV` environment variable). It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
+Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
+
+You should use this module instead of using if/switch statements and the `NODE_ENV` environment variable directly. This will make your application easier to configure when it grows.
 
 ## Basic usage
 
@@ -72,7 +74,15 @@ Individual values in the loaded configuration can be overridden by placing a fil
 someProp=some other value
 server.host=example.com
 flags.someFlag=true
+
+# The .env file can contain comments which is nice
+# when you want to easily switch between values
+#server.host=prod.example.com
+#server.host=stage.example.com
+#server.host=test.example.com
 ```
+
+If you use [nodemon](http://nodemon.io/) to automatically restart your app while developing, you should add `"watch": ["*", ".env"]` to your `nodemon.json` file so that the app is restarted whenever you change your `.env` file.
 
 It's also possible to override configuration by specifying them as environment variables when starting the application, like this:
 
