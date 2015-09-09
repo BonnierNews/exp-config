@@ -36,6 +36,13 @@ describe("config", function() {
     require("../index").should.have.property("overridden").equal("from .env");
   });
 
+  it("parses boolean values from .env file", function() {
+    var config = require("../index");
+    config.should.have.property("bool1").equal(true);
+    config.should.have.property("bool2").equal(true);
+    config.should.have.property("bool3").equal(false);
+  });
+
   it("retrives values from .env files from <app root>", function() {
     require("../tmp/index").should.have.property("overridden").equal("from .env");
   });
@@ -46,6 +53,13 @@ describe("config", function() {
     config = require("../index");
     config.should.have.property("overridden").equal("from test.json");
     delete process.env.NODE_ENV;
+  });
+
+  it("parses boolean values from environment variables", function() {
+    process.env.BOOL_TEST = "true";
+    var config = require("../index");
+    config.should.have.property("BOOL_TEST").equal(true);
+    delete process.env.BOOL_TEST;
   });
 
   it("supports overriding values with environment variables", function() {

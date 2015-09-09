@@ -36,6 +36,7 @@ function expandPath(name) {
 
 function setConfig(name, value) {
   var expanded = expandPath(name);
+  if (/^(true|false)$/i.test(value)) value = (value.toLowerCase() === "true");
   expanded.current[expanded.last] = value;
 }
 
