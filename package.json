@@ -22,6 +22,7 @@
     "url": "http://github.com/ExpressenAB/exp-config/raw/master/LICENSE"
   },
   "dependencies": {
+    "change-case": "^2.3.0",
     "dotenv": "~0.5.1",
     "lodash": "^3.6.0"
   },
