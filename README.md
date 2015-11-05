@@ -98,6 +98,9 @@ In other words, environment variables take precedence over `.env` files and conf
 
 _NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) `.env` files are ignored. Otherwise this file likely would have to be edited every time `npm test` is invoked.
 
+_NOTE II, exception to the excpetion_: If you want your .env file and environment variables to be honored in the `test` environment, you can set the `ALLOW_ENV_OVERRIDE` environment variable. 
+
+
 ## Specifying the root folder
 
 By default `exp-config` tries to locate the config folder and the (optional) `.env` file by using `process.cwd()`. This works great when starting the application from it's root folder. However, sometimes that's not possible. In such cases the root path can be specified by setting an environment variable named `CONFIG_BASE_PATH`, like this:
