@@ -42,7 +42,7 @@ function setConfig(name, value) {
 
 config = applyDefault(config);
 
-if (envName !== "test") {
+if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
   // Config from .env file have precedence over environment json config
   var dotenvPath = path.join(basePath, ".env");
   if (fs.existsSync(dotenvPath)) {

@@ -94,7 +94,9 @@ Values are loaded with the following precedence:
 2. .env file
 3. Configuration file
 
-In other words, environment variables take precedence over `.env` files and configuration files. However, there is one exception. When `NODE_ENV` equals `test` (`NODE_ENV=test`) environment variables and `.env` files are ignored.
+In other words, environment variables take precedence over `.env` files and configuration files.
+
+_NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) `.env` files are ignored. Otherwise this file likely would have to be edited every time `npm test` is invoked.
 
 ## Specifying the root folder
 

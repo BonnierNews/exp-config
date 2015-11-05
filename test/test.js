@@ -55,6 +55,16 @@ describe("config", function() {
     delete process.env.NODE_ENV;
   });
 
+  it("uses values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", function() {
+    process.env.NODE_ENV = "test";
+    process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+    var config = require("../index");
+    config = require("../index");
+    config.should.have.property("overridden").equal("from .env");
+    delete process.env.NODE_ENV;
+    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+  });
+
   it("parses boolean values from environment variables", function() {
     process.env.BOOL_TEST = "true";
     var config = require("../index");
@@ -80,6 +90,17 @@ describe("config", function() {
     delete process.env.NODE_ENV;
     delete process.env.overridden;
   });
+
+  it("uses environment variables when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", function() {
+    process.env.NODE_ENV = "test";
+    process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+    process.env.overridden = "from environment variable";
+    require("../index").should.have.property("overridden").equal("from environment variable");
+    delete process.env.NODE_ENV;
+    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+    delete process.env.overridden;
+  });
+  
 
   it("supports reading config from a custom base path", function() {
     process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
