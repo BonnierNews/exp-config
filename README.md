@@ -96,9 +96,9 @@ Values are loaded with the following precedence:
 
 In other words, environment variables take precedence over `.env` files and configuration files.
 
-_NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) `.env` files are ignored. Otherwise this file likely would have to be edited every time `npm test` is invoked.
+_NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) the `.env` file and environment variables are ignored. We want the test process to be as isolated and repeatable as possible, and are therefore minimizing the possibility of sticky human fingers messing with its configuration.
 
-_NOTE II, exception to the exception_: If you want your .env file and environment variables to be honored in the `test` environment, you can set the `ALLOW_ENV_OVERRIDE` environment variable. 
+_NOTE II, exception to the exception_: If you want your .env file and environment variables to be honored in the `test` environment, you can set the `ALLOW_ENV_OVERRIDE` environment variable. This is currently used for overriding certain configurations when doing in-container testing.
 
 
 ## Specifying the root folder
