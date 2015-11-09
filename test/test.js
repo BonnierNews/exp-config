@@ -55,12 +55,12 @@ describe("config", function() {
     delete process.env.NODE_ENV;
   });
 
-  it("uses values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", function() {
+  it("doensn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", function() {
     process.env.NODE_ENV = "test";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     var config = require("../index");
     config = require("../index");
-    config.should.have.property("overridden").equal("from .env");
+    config.should.have.property("overridden").equal("from test.json");
     delete process.env.NODE_ENV;
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });

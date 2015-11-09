@@ -42,7 +42,7 @@ function setConfig(name, value) {
 
 config = applyDefault(config);
 
-if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
+if (envName !== "test") {
   // Config from .env file have precedence over environment json config
   var dotenvPath = path.join(basePath, ".env");
   if (fs.existsSync(dotenvPath)) {
@@ -51,7 +51,9 @@ if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
       setConfig(key, dotenvConfig[key]);
     });
   }
+}
 
+if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
   // Real env vars should have precedence over .env
   Object.keys(process.env).forEach(function(key) {
     setConfig(key, process.env[key]);

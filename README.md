@@ -98,7 +98,7 @@ In other words, environment variables take precedence over `.env` files and conf
 
 _NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) the `.env` file and environment variables are ignored. We want the test process to be as isolated and repeatable as possible, and are therefore minimizing the possibility of sticky human fingers messing with its configuration.
 
-_NOTE II, exception to the exception_: If you want your .env file and environment variables to be honored in the `test` environment, you can set the `ALLOW_ENV_OVERRIDE` environment variable. This is currently used for overriding certain configurations when doing in-container testing.
+_NOTE II, exception to the exception_: If you want environment variables to be honored in the `test` environment, you can set the `ALLOW_ENV_OVERRIDE` environment variable. This is useful for overriding certain configurations when doing in-container testing. The `.env` file will still be ignored however.
 
 
 ## Specifying the root folder
