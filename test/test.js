@@ -65,6 +65,24 @@ describe("config", function() {
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });
 
+  it("should use ENV_PATH, if set, to load other .env file", function() {
+    process.env.NODE_ENV = "development";
+    process.env.ENV_PATH = "tmp/.test-env";
+    var config = require("../index");
+    config.should.have.property("overridden").equal("from .test-env");
+    delete process.env.NODE_ENV;
+    delete process.env.ENV_PATH;
+  });
+
+  it("should still use ENV_PATH even if it points to a non existant file", function() {
+    process.env.NODE_ENV = "development";
+    process.env.ENV_PATH = "file-that-doesnt-exist";
+    var config = require("../index");
+    config.should.have.property("overridden").equal("from development.json");
+    delete process.env.NODE_ENV;
+    delete process.env.ENV_PATH;
+  });
+
   it("parses boolean values from environment variables", function() {
     process.env.BOOL_TEST = "true";
     var config = require("../index");
@@ -150,4 +168,7 @@ function createTempFiles() {
   originalPath = path.join(__dirname, "../.env");
   tempPath = path.join(__dirname, "../tmp/.env");
   fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+
+  tempPath = path.join(__dirname, "../tmp/.test-env");
+  fs.writeFileSync(tempPath, "overridden=\"from .test-env\"");
 }

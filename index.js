@@ -43,8 +43,9 @@ function setConfig(name, value) {
 config = applyDefault(config);
 
 if (envName !== "test") {
-  // Config from .env file have precedence over environment json config
-  var dotenvPath = path.join(basePath, ".env");
+  // Config from env file path have precedence over environment json config
+  var envPath = process.env.ENV_PATH || ".env";
+  var dotenvPath = path.join(basePath, envPath);
   if (fs.existsSync(dotenvPath)) {
     var dotenvConfig = dotenv.parse(fs.readFileSync(dotenvPath));
     Object.keys(dotenvConfig).forEach(function(key) {

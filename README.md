@@ -86,6 +86,14 @@ To override nested properties with environment variables do like this:
 $ env 'flags.someFlag=false' node .
 ```
 
+### Specifying other .env file
+
+By default `exp-config` uses a file called .env in the root folder, you can override this by setting an environment variable named `ENV_PATH` to the new files path and name. NOTE: this is relative to the projects root folder.
+
+```
+$ ENV_PATH=relative/env/path/.envfile node /home/someuser/myapp/app.js
+```
+
 ### Precedence and values in tests
 
 Values are loaded with the following precedence:
