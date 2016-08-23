@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 var dotenv = require("dotenv");
-var _ = require("lodash");
+var assign = require("lodash.assign");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
@@ -15,7 +15,7 @@ function applyDefault(config) {
       defaultConfig = require(path.join(basePath, "config", "default.json"));
     }
   } catch (e) {}
-  return _.assign({}, defaultConfig, config);
+  return assign({}, defaultConfig, config);
 }
 
 function expandPath(name) {

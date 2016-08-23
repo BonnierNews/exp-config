@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "dotenv": "~0.5.1",
-    "lodash": "^3.6.0"
+    "lodash.assign": "^4.2.0"
   },
   "devDependencies": {
     "mocha": "~2.1.0",
