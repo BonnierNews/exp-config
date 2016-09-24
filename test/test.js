@@ -208,6 +208,12 @@ function createTempFiles() {
     if ( e.code !== "EEXIST" ) throw e;
   }
 
+  try {
+    fs.mkdirSync(path.join(__dirname, "../tmp/config-js"));
+  } catch(e) {
+    if ( e.code !== "EEXIST" ) throw e;
+  }
+
   var originalPath = path.join(__dirname, "../index.js");
   var tempPath = path.join(__dirname, "../tmp/index.js");
   fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
