@@ -141,6 +141,58 @@ describe("config", function() {
     config.overridden.should.eql("from .env");
     config.newProp.should.eql(true);
   });
+
+  describe("config files in .js", function() {
+    before(function() {
+      process.env.NODE_ENV = "livedata";
+      process.env.CONFIG_DIR = "config-js";
+      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
+      var originalPath = path.join(__dirname, "../config/template.js");
+      var tempPath = path.join(__dirname, "../tmp/config-js/livedata.js");
+      fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+    });
+
+    it("retrives values from .js files specified in the NODE_ENV environment variable", function() {
+      // init config
+      var config = require("../index");
+      config.overridden.should.equal("from .env");
+      config.level1.should.have.property("prop").equal("config");
+      config.level1.should.have.property("array").eql(["config"]);
+    });
+
+    describe("default file in .js", function() {
+      var tempPath;
+
+      afterEach(function() {
+        delete require.cache[require.resolve("../tmp/config-js/default")];
+        fs.unlinkSync(tempPath);
+      });
+
+      it("supports a default.js for default config", function () {
+        // create default config file
+        tempPath = path.join(__dirname, "../tmp/config-js/default.js");
+        fs.writeFileSync(tempPath, "module.exports = { newJsProp: true };");
+        // init config
+        var config = require("../index");
+        config.prop.should.eql("from config");
+        config.overridden.should.eql("from .env");
+        config.newJsProp.should.eql(true);
+      });
+
+      it("should merge config with default file", function() {
+        // create default config file
+        tempPath = path.join(__dirname, "../tmp/config-js/default.js");
+        fs.writeFileSync(tempPath, "module.exports = { level1: { array: [\"default\"], level2: { default: true } } };");
+        // init config
+        var config = require("../index");
+        config.level1.should.have.property("level2").eql({
+          default: true,
+          config: true
+        });
+        config.level1.should.have.property("array").eql(["config"]);
+      });
+    });
+  });
 });
 
 function createTempFiles() {

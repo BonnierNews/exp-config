@@ -5,17 +5,15 @@ var _ = require("lodash");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
+var configDir = process.env.CONFIG_DIR || "config";
 var defaultConfig = {};
-var config = require(path.join(basePath, "config", envName));
+var config = require(path.join(basePath, configDir, envName));
 
 function applyDefault(config) {
   try {
-    var hasDefaultConf = fs.statSync(path.join(basePath, "config", "default.json"));
-    if (hasDefaultConf.isFile()) {
-      defaultConfig = require(path.join(basePath, "config", "default.json"));
-    }
+      defaultConfig = require(path.join(basePath, configDir, "default"));
   } catch (e) {}
-  return _.assign({}, defaultConfig, config);
+  return _.merge({}, defaultConfig, config);
 }
 
 function expandPath(name) {
