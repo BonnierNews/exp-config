@@ -5,13 +5,12 @@ var _ = require("lodash");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
-var configDir = process.env.CONFIG_DIR || "config";
 var defaultConfig = {};
-var config = require(path.join(basePath, configDir, envName));
+var config = require(path.join(basePath, "config", envName));
 
 function applyDefault(config) {
   try {
-      defaultConfig = require(path.join(basePath, configDir, "default"));
+      defaultConfig = require(path.join(basePath, "config", "default"));
   } catch (e) {}
   return _.merge({}, defaultConfig, config);
 }

@@ -145,17 +145,15 @@ describe("config", function() {
   describe("config files in .js", function() {
     before(function() {
       process.env.NODE_ENV = "livedata";
-      process.env.CONFIG_DIR = "config-js";
-      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
+      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/js-base-path");
       var originalPath = path.join(__dirname, "../config/template.js");
-      var tempPath = path.join(__dirname, "../tmp/config-js/livedata.js");
+      var tempPath = path.join(__dirname, "../tmp/js-base-path/config/livedata.js");
       fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
     });
 
     it("retrives values from .js files specified in the NODE_ENV environment variable", function() {
       // init config
       var config = require("../index");
-      config.overridden.should.equal("from .env");
       config.level1.should.have.property("prop").equal("config");
       config.level1.should.have.property("array").eql(["config"]);
     });
@@ -164,24 +162,23 @@ describe("config", function() {
       var tempPath;
 
       afterEach(function() {
-        delete require.cache[require.resolve("../tmp/config-js/default")];
+        delete require.cache[require.resolve("../tmp/js-base-path/config/default")];
         fs.unlinkSync(tempPath);
       });
 
       it("supports a default.js for default config", function () {
         // create default config file
-        tempPath = path.join(__dirname, "../tmp/config-js/default.js");
+        tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
         fs.writeFileSync(tempPath, "module.exports = { newJsProp: true };");
         // init config
         var config = require("../index");
         config.prop.should.eql("from config");
-        config.overridden.should.eql("from .env");
         config.newJsProp.should.eql(true);
       });
 
       it("should merge config with default file", function() {
         // create default config file
-        tempPath = path.join(__dirname, "../tmp/config-js/default.js");
+        tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
         fs.writeFileSync(tempPath, "module.exports = { level1: { array: [\"default\"], level2: { default: true } } };");
         // init config
         var config = require("../index");
@@ -195,24 +192,20 @@ describe("config", function() {
   });
 });
 
+function createFolder(dir) {
+  try {
+    fs.mkdirSync(path.join(__dirname, dir));
+  } catch(e) {
+    if ( e.code !== "EEXIST" ) throw e;
+  }
+}
+
 function createTempFiles() {
-  try {
-    fs.mkdirSync(path.join(__dirname, "../tmp"));
-  } catch(e) {
-    if ( e.code !== "EEXIST" ) throw e;
-  }
+  createFolder("../tmp");
+  createFolder("../tmp/config");
+  createFolder("../tmp/js-base-path");
+  createFolder("../tmp/js-base-path/config");
 
-  try {
-    fs.mkdirSync(path.join(__dirname, "../tmp/config"));
-  } catch(e) {
-    if ( e.code !== "EEXIST" ) throw e;
-  }
-
-  try {
-    fs.mkdirSync(path.join(__dirname, "../tmp/config-js"));
-  } catch(e) {
-    if ( e.code !== "EEXIST" ) throw e;
-  }
 
   var originalPath = path.join(__dirname, "../index.js");
   var tempPath = path.join(__dirname, "../tmp/index.js");
