@@ -86,7 +86,7 @@ describe("config", function() {
   it("parses boolean values from environment variables", function() {
     process.env.BOOL_TEST = "true";
     var config = require("../index");
-    config.should.have.property("BOOL_TEST").equal(true);
+    config.should.have.property("boolTest").equal(true);
     delete process.env.BOOL_TEST;
   });
 
@@ -94,6 +94,18 @@ describe("config", function() {
     process.env.prop = "from environment variable";
     require("../index").should.have.property("prop").equal("from environment variable");
     delete process.env.prop;
+  });
+
+  it("supports overriding values with upper case environment variables", function() {
+    process.env.PROP = "from environment variable";
+    require("../index").should.have.property("prop").equal("from environment variable");
+    delete process.env.PROP;
+  });
+
+  it("supports overriding values with snake case environment variables", function() {
+    process.env.PROP_TEST = "from environment variable";
+    require("../index").should.have.property("propTest").equal("from environment variable");
+    delete process.env.PROP_TEST;
   });
 
   it("gives precedence to environment variables over .env", function() {

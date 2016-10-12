@@ -1,6 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 var dotenv = require("dotenv");
+var changeCase = require("change-case");
 var _ = require("lodash");
 
 var envName = process.env.NODE_ENV || "development";
@@ -17,7 +18,13 @@ function applyDefault(config) {
 
 function expandPath(name) {
   var current = config;
-  var parts = name.split(/\./);
+  var parts = _.map(name.split(/\./), function (part) {
+    if (changeCase.isUpperCase(part)) {
+      return changeCase.camelCase(part);
+    } else {
+      return part;
+    }
+  });
   var last = parts.pop();
   parts.forEach(function(part) {
     if (!current.hasOwnProperty(part)) {
