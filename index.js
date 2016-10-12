@@ -10,12 +10,9 @@ var config = require(path.join(basePath, "config", envName));
 
 function applyDefault(config) {
   try {
-    var hasDefaultConf = fs.statSync(path.join(basePath, "config", "default.json"));
-    if (hasDefaultConf.isFile()) {
-      defaultConfig = require(path.join(basePath, "config", "default.json"));
-    }
+      defaultConfig = require(path.join(basePath, "config", "default"));
   } catch (e) {}
-  return _.assign({}, defaultConfig, config);
+  return _.merge({}, defaultConfig, config);
 }
 
 function expandPath(name) {
