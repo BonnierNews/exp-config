@@ -146,16 +146,16 @@ describe("config", function() {
   it("should suppoort a prefix for bash variables", function() {
     process.env.ENV_PREFIX = "MY_ENV_";   
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
-    process.env.MY_ENV_overridden = "from environment variable";
+    process.env.MY_ENV_overridden = "from environment variable"; // jshint ignore:line
     var conf = require("../index");
     conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
     conf.should.have.property("overridden").equal("from environment variable");
     delete process.env.NODE_ENV;
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
-    delete process.env.MY_ENV_overridden;
+    delete process.env.MY_ENV_overridden; // jshint ignore:line
     delete process.env.ENV_PREFIX;
-  })
+  });
 
   describe("config files in .js", function() {
     before(function() {
