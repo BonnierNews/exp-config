@@ -140,7 +140,22 @@ describe("config", function() {
     config.prop.should.eql("from custom");
     config.overridden.should.eql("from .env");
     config.newProp.should.eql(true);
+    delete process.env.CONFIG_BASE_PATH;
   });
+  
+  it("should suppoort a prefix for bash variables", function() {
+    process.env.ENV_PREFIX = "MY_ENV_";   
+    process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+    process.env.MY_ENV_overridden = "from environment variable";
+    var conf = require("../index");
+    conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
+    conf.should.have.property("overridden").equal("from environment variable");
+    delete process.env.NODE_ENV;
+    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+    delete process.env.overridden;
+    delete process.env.MY_ENV_overridden;
+    delete process.env.ENV_PREFIX;
+  })
 
   describe("config files in .js", function() {
     before(function() {

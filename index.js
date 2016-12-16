@@ -5,6 +5,7 @@ var _ = require("lodash");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
+var prefix = process.env.ENV_PREFIX;
 var defaultConfig = {};
 var config = require(path.join(basePath, "config", envName));
 
@@ -54,7 +55,8 @@ if (envName !== "test") {
 if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
   // Real env vars should have precedence over .env
   Object.keys(process.env).forEach(function(key) {
-    setConfig(key, process.env[key]);
+    var envKey = prefix ? key.replace(prefix, "") : key;
+    setConfig(envKey, process.env[key]);
   });
 }
 
