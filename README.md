@@ -127,6 +127,14 @@ By default `exp-config` tries to locate the config folder and the (optional) `.e
 $ CONFIG_BASE_PATH=/home/someuser/myapp/ node /home/someuser/myapp/app.js
 ```
 
+## Specifying a bash variable prefix
+
+By default `exp-config` allows the variables to overriden by bash variables. Setting the `ENV_PREFIX` allows to override your variables even if there injected with a prefix. If for your environment makes your s3 settings accessible for you via the bash variables `S3_key`, `S3_secret` and `S3_bucket`, and you want to override the settings for `key`, `secret` and `bucket` in your config file. Settings `ENV_PREFIX=S3_` allows you to do this.
+
+```
+$ ENV_PREFIX=S3_ node /home/someuser/myapp/app.js
+```
+
 ## Usage pattern
 
 An application using `exp-config` typically have a directory structure like this:
