@@ -7,7 +7,8 @@
     "Gabriel Falkenberg <gabriel.falkenberg@gmail.com>",
     "Jens Carlén",
     "Joel Abrahamsson <mail@joelabrahamsson.com>",
-    "William Sköld <william.skold@gmail.com>"
+    "William Sköld <william.skold@gmail.com>",
+    "Pål Edman"
   ],
   "scripts": {
     "test": "mocha --reporter spec && eslint . --cache"
