@@ -22,13 +22,13 @@
     "url": "http://github.com/ExpressenAB/exp-config/raw/master/LICENSE"
   },
   "dependencies": {
-    "dotenv": "~0.5.1",
-    "lodash": "^3.6.0"
+    "dotenv": "~2.0.0",
+    "lodash.merge": "^4.6.0"
   },
   "devDependencies": {
-    "mocha": "~2.1.0",
-    "chai": "~2.0.0",
-    "jshint": "~2.6.0"
+    "mocha": "~3.0.2",
+    "chai": "~3.5.0",
+    "jshint": "~2.9.3"
   },
   "files": [
     "index.js",

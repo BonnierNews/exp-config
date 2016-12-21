@@ -1,7 +1,7 @@
 var fs = require("fs");
 var path = require("path");
 var dotenv = require("dotenv");
-var _ = require("lodash");
+var merge = require("lodash.merge");
 
 var envName = process.env.NODE_ENV || "development";
 var basePath = process.env.CONFIG_BASE_PATH || process.cwd();
@@ -13,7 +13,7 @@ function applyDefault(config) {
   try {
       defaultConfig = require(path.join(basePath, "config", "default"));
   } catch (e) {}
-  return _.merge({}, defaultConfig, config);
+  return merge({}, defaultConfig, config);
 }
 
 function expandPath(name) {
