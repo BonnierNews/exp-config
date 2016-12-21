@@ -3,7 +3,9 @@ exp-config
 
 [![Build Status](https://travis-ci.org/ExpressenAB/exp-config.svg?branch=master)](https://travis-ci.org/ExpressenAB/exp-config)
 
-Loads configuration from JSON files from a `<app_root>/config` directory. The loaded configuration file can differ depending on the environment (determined by the `NODE_ENV` environment variable). It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
+Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
+
+You should use this module instead of using if/switch statements and the `NODE_ENV` environment variable directly. This will make your application easier to configure when it grows.
 
 # NPM Versions
 
@@ -76,7 +78,15 @@ Individual values in the loaded configuration can be overridden by placing a fil
 someProp=some other value
 server.host=example.com
 flags.someFlag=true
+
+# The .env file can contain comments which is nice
+# when you want to easily switch between values
+#server.host=prod.example.com
+#server.host=stage.example.com
+#server.host=test.example.com
 ```
+
+If you use [nodemon](http://nodemon.io/) to automatically restart your app while developing, you should add `"watch": ["*", ".env"]` to your `nodemon.json` file so that the app is restarted whenever you change your `.env` file.
 
 It's also possible to override configuration by specifying them as environment variables when starting the application, like this:
 
@@ -119,6 +129,14 @@ By default `exp-config` tries to locate the config folder and the (optional) `.e
 
 ```
 $ CONFIG_BASE_PATH=/home/someuser/myapp/ node /home/someuser/myapp/app.js
+```
+
+## Specifying a bash variable prefix
+
+By default `exp-config` allows the variables to overriden by bash variables. Setting the `ENV_PREFIX` allows to override your variables even if there injected with a prefix. If for your environment makes your s3 settings accessible for you via the bash variables `S3_key`, `S3_secret` and `S3_bucket`, and you want to override the settings for `key`, `secret` and `bucket` in your config file. Settings `ENV_PREFIX=S3_` allows you to do this.
+
+```
+$ ENV_PREFIX=S3_ node /home/someuser/myapp/app.js
 ```
 
 ## Usage pattern

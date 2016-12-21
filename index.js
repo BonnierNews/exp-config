@@ -3,20 +3,19 @@
 const fs = require("fs");
 const path = require("path");
 const dotenv = require("dotenv");
+const merge = require("lodash.merge");
 
 const envName = process.env.NODE_ENV || "development";
 const basePath = process.env.CONFIG_BASE_PATH || process.cwd();
+const prefix = process.env.ENV_PREFIX;
 let defaultConfig = {};
 let config = require(path.join(basePath, "config", envName));
 
 function applyDefault(sourceConfig) {
   try {
-    const hasDefaultConf = fs.statSync(path.join(basePath, "config", "default.json"));
-    if (hasDefaultConf.isFile()) {
-      defaultConfig = require(path.join(basePath, "config", "default.json"));
-    }
+      defaultConfig = require(path.join(basePath, "config", "default"));
   } catch (e) {} // eslint-disable-line
-  return Object.assign({}, defaultConfig, sourceConfig);
+  return merge({}, defaultConfig, sourceConfig);
 }
 
 function expandPath(name) {
@@ -58,7 +57,8 @@ if (envName !== "test") {
 if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
   // Real env vars should have precedence over .env
   Object.keys(process.env).forEach((key) => {
-    setConfig(key, process.env[key]);
+    const envKey = prefix ? key.replace(prefix, "") : key;
+    setConfig(envKey, process.env[key]);
   });
 }
 
