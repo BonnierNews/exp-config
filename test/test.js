@@ -118,7 +118,6 @@ describe("config", function() {
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
   });
-  
 
   it("supports reading config from a custom base path", function() {
     process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
@@ -141,21 +140,87 @@ describe("config", function() {
     config.prop.should.eql("from custom");
     config.overridden.should.eql("from .env");
     config.newProp.should.eql(true);
+    delete process.env.CONFIG_BASE_PATH;
+  });
+  
+  it("should suppoort a prefix for bash variables", function() {
+    process.env.ENV_PREFIX = "MY_ENV_";   
+    process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+    process.env.MY_ENV_overridden = "from environment variable"; // jshint ignore:line
+    var conf = require("../index");
+    conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
+    conf.should.have.property("overridden").equal("from environment variable");
+    delete process.env.NODE_ENV;
+    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+    delete process.env.overridden;
+    delete process.env.MY_ENV_overridden; // jshint ignore:line
+    delete process.env.ENV_PREFIX;
+  });
+
+  describe("config files in .js", function() {
+    before(function() {
+      process.env.NODE_ENV = "livedata";
+      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/js-base-path");
+      var originalPath = path.join(__dirname, "../config/template.js");
+      var tempPath = path.join(__dirname, "../tmp/js-base-path/config/livedata.js");
+      fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+    });
+
+    it("retrives values from .js files specified in the NODE_ENV environment variable", function() {
+      // init config
+      var config = require("../index");
+      config.level1.should.have.property("prop").equal("config");
+      config.level1.should.have.property("array").eql(["config"]);
+    });
+
+    describe("default file in .js", function() {
+      var tempPath;
+
+      afterEach(function() {
+        delete require.cache[require.resolve("../tmp/js-base-path/config/default")];
+        fs.unlinkSync(tempPath);
+      });
+
+      it("supports a default.js for default config", function () {
+        // create default config file
+        tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
+        fs.writeFileSync(tempPath, "module.exports = { newJsProp: true };");
+        // init config
+        var config = require("../index");
+        config.prop.should.eql("from config");
+        config.newJsProp.should.eql(true);
+      });
+
+      it("should merge config with default file", function() {
+        // create default config file
+        tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
+        fs.writeFileSync(tempPath, "module.exports = { level1: { array: [\"default\"], level2: { default: true } } };");
+        // init config
+        var config = require("../index");
+        config.level1.should.have.property("level2").eql({
+          default: true,
+          config: true
+        });
+        config.level1.should.have.property("array").eql(["config"]);
+      });
+    });
   });
 });
 
-function createTempFiles() {
+function createFolder(dir) {
   try {
-    fs.mkdirSync(path.join(__dirname, "../tmp"));
+    fs.mkdirSync(path.join(__dirname, dir));
   } catch(e) {
     if ( e.code !== "EEXIST" ) throw e;
   }
+}
 
-  try {
-    fs.mkdirSync(path.join(__dirname, "../tmp/config"));
-  } catch(e) {
-    if ( e.code !== "EEXIST" ) throw e;
-  }
+function createTempFiles() {
+  createFolder("../tmp");
+  createFolder("../tmp/config");
+  createFolder("../tmp/js-base-path");
+  createFolder("../tmp/js-base-path/config");
+
 
   var originalPath = path.join(__dirname, "../index.js");
   var tempPath = path.join(__dirname, "../tmp/index.js");
