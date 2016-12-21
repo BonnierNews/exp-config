@@ -7,6 +7,10 @@ Loads configuration from JSON files from a `<app_root>/config` directory. The `N
 
 You should use this module instead of using if/switch statements and the `NODE_ENV` environment variable directly. This will make your application easier to configure when it grows.
 
+# NPM Versions
+
+For node versions below 4 please use v1.3.4 - `npm i -S exp-config@1.3.4`.
+
 ## Basic usage
 
 ```
@@ -25,8 +29,8 @@ In your code require `exp-config` and retrieve the configuration value:
 
 
 ```javascript
-var config = require("exp-config");
-var configuredValue = config.someProp;
+const config = require("exp-config");
+const configuredValue = config.someProp;
 ```
 
 You can also nest properties in the configuration files:
@@ -40,14 +44,14 @@ You can also nest properties in the configuration files:
 ```
 
 ```javascript
-var config = require("exp-config");
-var configuredValue = config.server.host;
+const config = require("exp-config");
+const configuredValue = config.server.host;
 ```
 
 Booleans need special care:
 
 ```javascript
-var config = require("exp-config");
+const config = require("exp-config");
 if (config.boolean("flags.someFlag")) {
   ...
 }
