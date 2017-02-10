@@ -3,7 +3,9 @@ exp-config
 
 [![Build Status](https://travis-ci.org/ExpressenAB/exp-config.svg?branch=master)](https://travis-ci.org/ExpressenAB/exp-config)
 
-Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
+Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
+
+It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
 
 You should use this module instead of using if/switch statements and the `NODE_ENV` environment variable directly. This will make your application easier to configure when it grows.
 
@@ -48,7 +50,7 @@ const config = require("exp-config");
 const configuredValue = config.server.host;
 ```
 
-Booleans need special care:
+Booleans may need special care:
 
 ```javascript
 const config = require("exp-config");
@@ -57,7 +59,7 @@ if (config.boolean("flags.someFlag")) {
 }
 ```
 
-If you just use `config.flags.someFlag` to prevent the string `"false"` (which is truthy) to cause problems.
+This is to prevent `config.flags.someFlag` having the value `"false"` (which is truthy) to cause problems.
 
 
 ## Different configuration files for different environments
@@ -68,7 +70,7 @@ By default exp-config loads `<app_root>/config/development.json`. This behavior 
 $ NODE_ENV=production node app
 ```
 
-When starting an application in this way `exp-config` will instead load `<app_root>/config/production.json`. Likewise, it's common to have a separate configuration file for tests, and using `NODE_ENV=test` when running them.
+When starting an application in this way `exp-config` will instead load `<app_root>/config/production.json`. Likewise, it's common to have a separate configuration file for tests, and use `NODE_ENV=test` when running them.
 
 ## Overriding configuration values
 
@@ -102,7 +104,7 @@ $ env 'flags.someFlag=false' node .
 
 ### Specifying other .env file
 
-By default `exp-config` uses a file called .env in the root folder, you can override this by setting an environment variable named `ENV_PATH` to the new files path and name. NOTE: this is relative to the projects root folder.
+By default `exp-config` uses a file called `.env` in the root folder, you can override this by setting an environment variable named `ENV_PATH` to the new files path and name. NOTE: this is relative to the projects root folder.
 
 ```
 $ ENV_PATH=relative/env/path/.envfile node /home/someuser/myapp/app.js
@@ -133,7 +135,7 @@ $ CONFIG_BASE_PATH=/home/someuser/myapp/ node /home/someuser/myapp/app.js
 
 ## Specifying a bash variable prefix
 
-By default `exp-config` allows the variables to overriden by bash variables. Setting the `ENV_PREFIX` allows to override your variables even if there injected with a prefix. If for your environment makes your s3 settings accessible for you via the bash variables `S3_key`, `S3_secret` and `S3_bucket`, and you want to override the settings for `key`, `secret` and `bucket` in your config file. Settings `ENV_PREFIX=S3_` allows you to do this.
+By default `exp-config` allows the values to be overriden by bash variables. Setting the `ENV_PREFIX` enables you to override your variables even if they are injected with a prefix. For example, if your environment makes s3 settings accessible for you via the bash variables `S3_key`, `S3_secret` and `S3_bucket`, and you want to override the settings for `key`, `secret` and `bucket` in your config file, setting `ENV_PREFIX=S3_` allows you to do this.
 
 ```
 $ ENV_PREFIX=S3_ node /home/someuser/myapp/app.js
@@ -147,8 +149,9 @@ An application using `exp-config` typically have a directory structure like this
 .
 ├── .env <-- Overrides for local development, not committed to source control
 ├── config <-- Configuration files committed to source control
-|   ├── development.json <-- default file, used during local development
+|   ├── development.json <-- used during local development, loaded if NODE_ENV is unset
 |   ├── production.json <-- used in production by setting NODE_ENV
 |   └── test.json <-- used in tests by setting NODE_ENV
+|   └── default.json <-- shared settings, optional
 └── app.js <-- the app
 ```
