@@ -1,5 +1,11 @@
 {
   "prop": "default",
   "newProp": true,
-  "overridden": "from default.json"
+  "overridden": "from default.json",
+  "nested": {
+  	"prop": true,
+  	"nested": {
+  		"prop": false
+  	}
+  }
 }

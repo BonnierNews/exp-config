@@ -159,6 +159,62 @@ describe("config", () => {
     delete process.env.ENV_PREFIX;
   });
 
+  describe("replace token from bash variable", () => {
+    afterEach(() => {
+      delete process.env.CONVERT_CHAR_TO_DOTS;
+      delete process.env.nested_prop;
+      delete process.env.NODE_ENV;
+      delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+      delete process.env.MY_ENV_nested_prop; // jshint ignore:line
+      delete process.env.ENV_PREFIX;
+    });
+
+    it("should replace dots the given char in CONVERT_CHAR_TO_DOTS", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.nested_prop = "from environment variable"; //eslint-disable-line camelcase
+      const conf = require("../index");
+      conf.nested.prop.should.eql("from environment variable");
+      conf.should.not.have.property("nested_prop").equal("from environment variable");
+    });
+
+    it("should replace dots the given char in CONVERT_CHAR_TO_DOTS multiple times", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.nested_nested_prop = "from environment variable"; //eslint-disable-line camelcase
+      const conf = require("../index");
+      conf.nested.nested.prop.should.eql("from environment variable");
+      conf.should.not.have.property("nested_nested_prop").equal("from environment variable");
+    });
+
+
+    it("should not replace variables in config file", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      const conf = require("../index");
+      conf.should.not.have.property("nested_prop");
+      conf.nested.prop.should.eql(true);
+    });
+
+    it("should replace variables after ENV_PREFIX", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.ENV_PREFIX = "MY_ENV_";
+      process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+      process.env.MY_ENV_nested_prop = "from environment variable"; //eslint-disable-line camelcase
+      const conf = require("../index");
+      conf.nested.prop.should.eql("from environment variable");
+      conf.should.not.have.property("MY_ENV_nested_prop").equal("from environment variable");
+      conf.should.not.have.property("nested_prop").equal("from environment variable");
+    });
+
+    it("should only replace values that exists in config file", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.nested_prop2 = "from environment variable"; //eslint-disable-line camelcase
+      const conf = require("../index");
+      conf.nested.should.not.have.property("prop2").equal("from environment variable");
+      conf.should.have.property("nested_prop2").equal("from environment variable");
+    });
+
+    // TODO: race condition for . and _
+  });
+
   describe("config files in .js", () => {
     before(() => {
       process.env.NODE_ENV = "livedata";
