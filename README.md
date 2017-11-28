@@ -124,6 +124,10 @@ _NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) 
 
 _NOTE II, exception to the exception_: If you want environment variables to be honored in the `test` environment, you can set the `ALLOW_TEST_ENV_OVERRIDE` environment variable. This is useful for overriding certain configurations when doing in-container testing. The `.env` file will still be ignored however.
 
+### When periods are not allowed in environment variables
+
+In openshift and some versions of alpine, you are not allowed to set environvariables with periods (".") in them. To solve this exp-config allows you to set `INTERPRET_CHAR_AS_DOT` to any char you like to be interpret as a period. Setting `INTERPRET_CHAR_AS_DOT=_` and `foo_baz_bar="value"` will set the value `foo.baz.bar` to `"value"` as long as `foo.baz.bar` it exists in the config-file.
+
 
 ## Specifying the root folder
 
