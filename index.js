@@ -65,7 +65,7 @@ if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
 function convertKey(key) {
     const envKey = prefix ? key.replace(prefix, "") : key;
     const replacedEnvKey = charToConvert ? envKey.replace(new RegExp(charToConvert, "g"), ".") : envKey;
-    if (existsInConfig(replacedEnvKey)) {
+    if (existsInConfig(replacedEnvKey) && !process.env[replacedEnvKey]) {
       return replacedEnvKey;
     }
     return envKey;

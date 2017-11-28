@@ -167,6 +167,7 @@ describe("config", () => {
       delete process.env.ALLOW_TEST_ENV_OVERRIDE;
       delete process.env.MY_ENV_nested_prop; // jshint ignore:line
       delete process.env.ENV_PREFIX;
+      delete process.env.nested_prop2;
     });
 
     it("should replace dots the given char in CONVERT_CHAR_TO_DOTS", () => {
@@ -212,7 +213,13 @@ describe("config", () => {
       conf.should.have.property("nested_prop2").equal("from environment variable");
     });
 
-    // TODO: race condition for . and _
+    it("dots should have precedence over CONVERT_CHAR_TO_DOTS", () => {
+      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env["nested.prop"] = "baz";
+      process.env["nested_prop"] = "foo";
+      const conf = require("../index");
+      conf.nested.prop.should.equal("baz");
+    });
   });
 
   describe("config files in .js", () => {
