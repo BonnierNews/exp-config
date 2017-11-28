@@ -161,7 +161,7 @@ describe("config", () => {
 
   describe("replace token from bash variable", () => {
     afterEach(() => {
-      delete process.env.CONVERT_CHAR_TO_DOTS;
+      delete process.env.INTERPRET_CHAR_AS_DOT;
       delete process.env.nested_prop;
       delete process.env.NODE_ENV;
       delete process.env.ALLOW_TEST_ENV_OVERRIDE;
@@ -170,16 +170,16 @@ describe("config", () => {
       delete process.env.nested_prop2;
     });
 
-    it("should replace dots the given char in CONVERT_CHAR_TO_DOTS", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+    it("should replace dots the given char in INTERPRET_CHAR_AS_DOT", () => {
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.nested_prop = "from environment variable"; //eslint-disable-line camelcase
       const conf = require("../index");
       conf.nested.prop.should.eql("from environment variable");
       conf.should.not.have.property("nested_prop").equal("from environment variable");
     });
 
-    it("should replace dots the given char in CONVERT_CHAR_TO_DOTS multiple times", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+    it("should replace dots the given char in INTERPRET_CHAR_AS_DOT multiple times", () => {
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.nested_nested_prop = "from environment variable"; //eslint-disable-line camelcase
       const conf = require("../index");
       conf.nested.nested.prop.should.eql("from environment variable");
@@ -188,14 +188,14 @@ describe("config", () => {
 
 
     it("should not replace variables in config file", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       const conf = require("../index");
       conf.should.not.have.property("nested_prop");
       conf.nested.prop.should.eql(true);
     });
 
     it("should replace variables after ENV_PREFIX", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.ENV_PREFIX = "MY_ENV_";
       process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
       process.env.MY_ENV_nested_prop = "from environment variable"; //eslint-disable-line camelcase
@@ -206,17 +206,17 @@ describe("config", () => {
     });
 
     it("should only replace values that exists in config file", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.nested_prop2 = "from environment variable"; //eslint-disable-line camelcase
       const conf = require("../index");
       conf.nested.should.not.have.property("prop2").equal("from environment variable");
       conf.should.have.property("nested_prop2").equal("from environment variable");
     });
 
-    it("dots should have precedence over CONVERT_CHAR_TO_DOTS", () => {
-      process.env.CONVERT_CHAR_TO_DOTS = "_";
+    it("dots should have precedence over INTERPRET_CHAR_AS_DOT", () => {
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env["nested.prop"] = "baz";
-      process.env["nested_prop"] = "foo";
+      process.env.nested_prop = "foo"; //eslint-disable-line camelcase
       const conf = require("../index");
       conf.nested.prop.should.equal("baz");
     });

@@ -8,7 +8,7 @@ const merge = require("lodash.merge");
 const envName = process.env.NODE_ENV || "development";
 const basePath = process.env.CONFIG_BASE_PATH || process.cwd();
 const prefix = process.env.ENV_PREFIX;
-const charToConvert = process.env.CONVERT_CHAR_TO_DOTS;
+const charToConvert = process.env.INTERPRET_CHAR_AS_DOT;
 let defaultConfig = {};
 let config = require(path.join(basePath, "config", envName));
 
