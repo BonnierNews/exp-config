@@ -8,6 +8,7 @@ const merge = require("lodash.merge");
 const envName = process.env.NODE_ENV || "development";
 const basePath = process.env.CONFIG_BASE_PATH || process.cwd();
 const prefix = process.env.ENV_PREFIX;
+const charToConvert = process.env.INTERPRET_CHAR_AS_DOT;
 let defaultConfig = {};
 let config = require(path.join(basePath, "config", envName));
 
@@ -57,10 +58,31 @@ if (envName !== "test") {
 if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
   // Real env vars should have precedence over .env
   Object.keys(process.env).forEach((key) => {
-    const envKey = prefix ? key.replace(prefix, "") : key;
-    setConfig(envKey, process.env[key]);
+    setConfig(convertKey(key), process.env[key]);
   });
 }
+
+function convertKey(key) {
+    const envKey = prefix ? key.replace(prefix, "") : key;
+    const replacedEnvKey = charToConvert ? envKey.replace(new RegExp(charToConvert, "g"), ".") : envKey;
+    if (existsInConfig(replacedEnvKey) && !process.env[replacedEnvKey]) {
+      return replacedEnvKey;
+    }
+    return envKey;
+}
+
+function existsInConfig(key) {
+    const parts = key.split(".");
+    let current = config;
+    const last = parts.pop();
+    parts.forEach((part) => {
+      if (current.hasOwnProperty(part)) {
+        current = current[part];
+      }
+    });
+    return current.hasOwnProperty(last);
+}
+
 
 config.envName = envName;
 
