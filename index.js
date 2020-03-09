@@ -24,7 +24,7 @@ function expandPath(name) {
   const parts = name.split(/\./);
   const last = parts.pop();
   parts.forEach((part) => {
-    if (!current.hasOwnProperty(part)) {
+    if (!Object.prototype.hasOwnProperty.call(current, part)) {
       current[part] = {};
     }
     current = current[part];
@@ -76,11 +76,11 @@ function existsInConfig(key) {
     let current = config;
     const last = parts.pop();
     parts.forEach((part) => {
-      if (current.hasOwnProperty(part)) {
+      if (Object.prototype.hasOwnProperty.call(current, part)) {
         current = current[part];
       }
     });
-    return current.hasOwnProperty(last);
+    return Object.prototype.hasOwnProperty.call(current, last);
 }
 
 
