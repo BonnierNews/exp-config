@@ -1,7 +1,7 @@
 exp-config
 =========
 
-[![Build Status](https://travis-ci.org/ExpressenAB/exp-config.svg?branch=master)](https://travis-ci.org/ExpressenAB/exp-config)
+![](https://github.com/ExpressenAB/exp-config/workflows/Run%20tests/badge.svg)
 
 Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
 
