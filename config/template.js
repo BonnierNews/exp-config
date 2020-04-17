@@ -5,7 +5,7 @@ module.exports = {
   level1: {
     prop: "config",
     array: ["config"],
-    level2: { config: true }
+    level2: { config: true },
   },
-  overridden: "from config.js"
+  overridden: "from config.js",
 };

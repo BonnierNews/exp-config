@@ -3,9 +3,9 @@
   "newProp": true,
   "overridden": "from default.json",
   "nested": {
-  	"prop": true,
-  	"nested": {
-  		"prop": false
-  	}
+    "prop": true,
+    "nested": {
+      "prop": false
+    }
   }
 }
