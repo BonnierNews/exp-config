@@ -186,7 +186,6 @@ describe("config", () => {
       conf.should.not.have.property("nested_nested_prop").equal("from environment variable");
     });
 
-
     it("should not replace variables in config file", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
       const conf = require("../index");
@@ -259,12 +258,15 @@ describe("config", () => {
       it("should merge config with default file", () => {
         // create default config file
         tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
-        fs.writeFileSync(tempPath, "module.exports = { level1: { array: [\"default\"], level2: { default: true } } };");
+        fs.writeFileSync(
+          tempPath,
+          'module.exports = { level1: { array: ["default"], level2: { default: true } } };'
+        );
         // init config
         const config = require("../index");
         config.level1.should.have.property("level2").eql({
           default: true,
-          config: true
+          config: true,
         });
         config.level1.should.have.property("array").eql(["config"]);
       });
@@ -276,7 +278,7 @@ function createFolder(dir) {
   try {
     fs.mkdirSync(path.join(__dirname, dir));
   } catch (e) {
-    if ( e.code !== "EEXIST" ) throw e;
+    if (e.code !== "EEXIST") throw e;
   }
 }
 
@@ -285,7 +287,6 @@ function createTempFiles() {
   createFolder("../tmp/config");
   createFolder("../tmp/js-base-path");
   createFolder("../tmp/js-base-path/config");
-
 
   let originalPath = path.join(__dirname, "../index.js");
   let tempPath = path.join(__dirname, "../tmp/index.js");
@@ -300,5 +301,5 @@ function createTempFiles() {
   fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
 
   tempPath = path.join(__dirname, "../tmp/.test-env");
-  fs.writeFileSync(tempPath, "overridden=\"from .test-env\"");
+  fs.writeFileSync(tempPath, 'overridden="from .test-env"');
 }

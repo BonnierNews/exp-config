@@ -14,7 +14,7 @@ let config = require(path.join(basePath, "config", envName));
 
 function applyDefault(sourceConfig) {
   try {
-      defaultConfig = require(path.join(basePath, "config", "default"));
+    defaultConfig = require(path.join(basePath, "config", "default"));
   } catch (e) {} // eslint-disable-line
   return merge({}, defaultConfig, sourceConfig);
 }
@@ -31,13 +31,13 @@ function expandPath(name) {
   });
   return {
     current: current,
-    last: last
+    last: last,
   };
 }
 
 function setConfig(name, value) {
   const expanded = expandPath(name);
-  if (/^(true|false)$/i.test(value)) value = (value.toLowerCase() === "true");
+  if (/^(true|false)$/i.test(value)) value = value.toLowerCase() === "true";
   expanded.current[expanded.last] = value;
 }
 
@@ -63,33 +63,34 @@ if (envName !== "test" || process.env.ALLOW_TEST_ENV_OVERRIDE) {
 }
 
 function convertKey(key) {
-    const envKey = prefix ? key.replace(prefix, "") : key;
-    const replacedEnvKey = charToConvert ? envKey.replace(new RegExp(charToConvert, "g"), ".") : envKey;
-    if (existsInConfig(replacedEnvKey) && !process.env[replacedEnvKey]) {
-      return replacedEnvKey;
-    }
-    return envKey;
+  const envKey = prefix ? key.replace(prefix, "") : key;
+  const replacedEnvKey = charToConvert
+    ? envKey.replace(new RegExp(charToConvert, "g"), ".")
+    : envKey;
+  if (existsInConfig(replacedEnvKey) && !process.env[replacedEnvKey]) {
+    return replacedEnvKey;
+  }
+  return envKey;
 }
 
 function existsInConfig(key) {
-    const parts = key.split(".");
-    let current = config;
-    const last = parts.pop();
-    parts.forEach((part) => {
-      if (Object.prototype.hasOwnProperty.call(current, part)) {
-        current = current[part];
-      }
-    });
-    return Object.prototype.hasOwnProperty.call(current, last);
+  const parts = key.split(".");
+  let current = config;
+  const last = parts.pop();
+  parts.forEach((part) => {
+    if (Object.prototype.hasOwnProperty.call(current, part)) {
+      current = current[part];
+    }
+  });
+  return Object.prototype.hasOwnProperty.call(current, last);
 }
-
 
 config.envName = envName;
 
 config.boolean = function (name) {
   const expanded = expandPath(name);
   const value = expanded.current[expanded.last];
-  return (value === true) || (value === "true");
+  return value === true || value === "true";
 };
 
 module.exports = config;

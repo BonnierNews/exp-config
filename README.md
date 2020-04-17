@@ -1,5 +1,4 @@
-exp-config
-=========
+# exp-config
 
 ![](https://github.com/ExpressenAB/exp-config/workflows/Run%20tests/badge.svg)
 
@@ -28,7 +27,6 @@ Create a file named `development.json` in a folder named config in the applicati
 ```
 
 In your code require `exp-config` and retrieve the configuration value:
-
 
 ```javascript
 const config = require("exp-config");
@@ -60,7 +58,6 @@ if (config.boolean("flags.someFlag")) {
 ```
 
 This is to prevent `config.flags.someFlag` having the value `"false"` (which is truthy) to cause problems.
-
 
 ## Different configuration files for different environments
 
@@ -127,7 +124,6 @@ _NOTE II, exception to the exception_: If you want environment variables to be h
 ### When periods are not allowed in environment variables
 
 In openshift and some versions of alpine, you are not allowed to set environvariables with periods (".") in them. To solve this exp-config allows you to set `INTERPRET_CHAR_AS_DOT` to any char you like to be interpret as a period. Setting `INTERPRET_CHAR_AS_DOT=_` and `foo_baz_bar="value"` will set the value `foo.baz.bar` to `"value"` as long as `foo.baz.bar` it exists in the config-file.
-
 
 ## Specifying the root folder
 
