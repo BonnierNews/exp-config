@@ -50,7 +50,7 @@ if (envName !== "test") {
   if (fs.existsSync(dotenvPath)) {
     const dotenvConfig = dotenv.parse(fs.readFileSync(dotenvPath));
     Object.keys(dotenvConfig).forEach((key) => {
-      setConfig(key, dotenvConfig[key]);
+      setConfig(convertKey(key), dotenvConfig[key]);
     });
   }
 }

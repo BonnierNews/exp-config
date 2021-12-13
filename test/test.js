@@ -57,7 +57,7 @@ describe("config", () => {
     delete process.env.NODE_ENV;
   });
 
-  it("doensn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", () => {
+  it("doesn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", () => {
     process.env.NODE_ENV = "test";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     let config = require("../index");
@@ -76,7 +76,7 @@ describe("config", () => {
     delete process.env.ENV_PATH;
   });
 
-  it("should still use ENV_PATH even if it points to a non existant file", () => {
+  it("should still use ENV_PATH even if it points to a non existent file", () => {
     process.env.NODE_ENV = "development";
     process.env.ENV_PATH = "file-that-doesnt-exist";
     const config = require("../index");
@@ -145,7 +145,7 @@ describe("config", () => {
     delete process.env.CONFIG_BASE_PATH;
   });
 
-  it("should suppoort a prefix for bash variables", () => {
+  it("should support a prefix for bash variables", () => {
     process.env.ENV_PREFIX = "MY_ENV_";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     process.env.MY_ENV_overridden = "from environment variable"; //eslint-disable-line camelcase
@@ -218,6 +218,18 @@ describe("config", () => {
       process.env.nested_prop = "foo"; //eslint-disable-line camelcase
       const conf = require("../index");
       conf.nested.prop.should.equal("baz");
+      delete process.env["nested.prop"];
+    });
+
+    it("should use INTERPRET_CHAR_AS_DOT when reading .env file", () => {
+      process.env.INTERPRET_CHAR_AS_DOT = "_";
+      process.env.NODE_ENV = "development";
+      process.env.ENV_PATH = "tmp/.test-nested-env";
+      const config = require("../index");
+      config.nested.should.have.property("prop").equal("from .test-nested-env");
+      delete process.env.NODE_ENV;
+      delete process.env.ENV_PATH;
+      delete process.env.INTERPRET_CHAR_AS_DOT;
     });
   });
 
@@ -302,4 +314,10 @@ function createTempFiles() {
 
   tempPath = path.join(__dirname, "../tmp/.test-env");
   fs.writeFileSync(tempPath, 'overridden="from .test-env"');
+
+  originalPath = path.join(__dirname, "../.env");
+
+  tempPath = path.join(__dirname, "../tmp/.test-nested-env");
+  fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+  fs.writeFileSync(tempPath, 'nested_prop="from .test-nested-env"');
 }
