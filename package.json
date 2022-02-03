@@ -1,8 +1,8 @@
 {
   "name": "exp-config",
   "description": "Simple configuration management",
-  "version": "3.0.0",
-  "author": "AB Kvällstidningen Expressen",
+  "version": "3.0.1",
+  "author": "Bonnier News",
   "contributors": [
     "Gabriel Falkenberg <gabriel.falkenberg@gmail.com>",
     "Jens Carlén",
