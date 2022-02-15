@@ -14,13 +14,13 @@
     "test": "mocha --reporter spec && eslint . --cache"
   },
   "main": "index.js",
-  "repository": "git://github.com/ExpressenAB/exp-config.git",
+  "repository": "git://github.com/BonnierNews/exp-config.git",
   "keywords": [
     "configuration"
   ],
   "license": {
     "type": "MIT",
-    "url": "http://github.com/ExpressenAB/exp-config/raw/master/LICENSE"
+    "url": "http://github.com/BonnierNews/exp-config/raw/master/LICENSE"
   },
   "dependencies": {
     "dotenv": "~8.2.0",
