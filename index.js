@@ -30,8 +30,8 @@ function expandPath(name) {
     current = current[part];
   });
   return {
-    current: current,
-    last: last,
+    current,
+    last,
   };
 }
 
