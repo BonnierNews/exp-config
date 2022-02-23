@@ -1,7 +1,7 @@
 {
   "name": "exp-config",
   "description": "Simple configuration management",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "author": "Bonnier News",
   "contributors": [
     "Gabriel Falkenberg <gabriel.falkenberg@gmail.com>",
@@ -33,7 +33,9 @@
     "mocha": "^9.2.0"
   },
   "files": [
+    "index.d.ts",
     "index.js",
-    "LICENSE"
+    "LICENSE",
+    "README.md"
   ]
 }
