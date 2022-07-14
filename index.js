@@ -5,7 +5,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const merge = require("lodash.merge");
 
-const envName = process.env.NODE_ENV || "development";
+const envName = process.env.NODE_CONFIG_ENV || process.env.NODE_ENV || "development";
 const basePath = process.env.CONFIG_BASE_PATH || process.cwd();
 const prefix = process.env.ENV_PREFIX;
 const charToConvert = process.env.INTERPRET_CHAR_AS_DOT;
