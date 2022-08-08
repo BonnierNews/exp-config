@@ -30,6 +30,14 @@ describe("config", () => {
     delete process.env.NODE_ENV;
   });
 
+  it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable", () => {
+    process.env.NODE_ENV = "development";
+    process.env.NODE_CONFIG_ENV = "test";
+    require("../index").should.have.property("prop").equal("from test");
+    delete process.env.NODE_ENV;
+    delete process.env.NODE_CONFIG_ENV;
+  });
+
   it("retrives values from JSON files from <app root>/config", () => {
     require("../tmp/index").should.have.property("prop").equal("value");
   });

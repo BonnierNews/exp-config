@@ -69,6 +69,16 @@ $ NODE_ENV=production node app
 
 When starting an application in this way `exp-config` will instead load `<app_root>/config/production.json`. Likewise, it's common to have a separate configuration file for tests, and use `NODE_ENV=test` when running them.
 
+### NODE_CONFIG_ENV
+
+In some cases you want or need to use `NODE_ENV=production` to get for instance performance benfits in [Express.js](https://expressjs.com/en/advanced/best-practice-performance.html#set-node_env-to-production). But we still want load specific configuration for an evironment you can use `NODE_CONFIG_ENV` to use for configuration identification.
+
+```
+NODE_ENV=production NODE_CONFIG_ENV=qa node app
+```
+
+The `qa` configuration would be used instead of the `production` configuration.
+
 ## Overriding configuration values
 
 Individual values in the loaded configuration can be overridden by placing a file named `.env` in the application's root (`<app_root>/.env`). An example `.env` file can look like this:
