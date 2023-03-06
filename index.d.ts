@@ -1,1 +1,1 @@
-declare module 'config';
+declare module 'exp-config';
