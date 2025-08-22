@@ -2,35 +2,42 @@ import { build, type Format } from "esbuild";
 import fsp from "fs/promises";
 import path from "path";
 import ts from "typescript";
+import { Buffer } from "node:buffer";
 
 import { paths } from "../lib/internal/helpers/paths.js";
 import { writeRecursively } from "../lib/internal/helpers/fs.js";
 
 async function esbuild(entryPoints: string[]) {
+  const esmRequireFiles = [ "config.js", "create-config.js" ];
+  const esmRequire = Buffer.from([
+    'import "dotenv/config";',
+    'import { createRequire } from "module";',
+    "let require = createRequire(import.meta.url);\n",
+  ].join("\n"), "utf8");
+
   await Promise.all(([
-    {
-      banner: {
-        // https://github.com/evanw/esbuild/issues/1944
-        js: "import \"dotenv/config\"; import { createRequire } from \"module\"; const require = createRequire(import.meta.url);",
-      },
-      format: "esm" as Format,
-    },
-    {
-      format: "cjs" as Format,
-      outExtension: { ".js": ".cjs" },
-    },
+    { format: "esm" as Format },
+    { format: "cjs" as Format, outExtension: { ".js": ".cjs" } },
   ]).map(async (args) => {
-    await build({
+    const results = await build({
       ...args,
-      entryPoints,
-      outdir: paths.distDir,
-      allowOverwrite: true,
+      write: false,
       bundle: true,
+      entryPoints,
       external: [ "typescript" ],
+      outdir: paths.distDir,
       platform: "node",
     });
-  }));
 
+    for (const out of results.outputFiles) {
+      writeRecursively(
+        out.path,
+        args.format === "esm" && esmRequireFiles.includes(path.basename(out.path))
+          ? Buffer.concat([ esmRequire, out.contents ]) // https://github.com/evanw/esbuild/issues/1944;
+          : out.contents
+      );
+    }
+  }));
 }
 
 async function buildScripts() {

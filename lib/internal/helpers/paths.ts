@@ -9,7 +9,6 @@ const paths = {
   configDir: path.join(rootDir, "config"),
   distDir: path.join(rootDir, "dist"),
   distEsmConfig: path.join(rootDir, "dist", "config.js"),
-  entry: path.join(rootDir, "app.ts"),
   env: path.join(rootDir, ".env"),
   libDir: path.join(rootDir, "lib"),
   rootDir,

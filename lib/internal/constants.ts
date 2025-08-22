@@ -1,7 +1,7 @@
 const Build = {
   Default: "Default",
   Test: "Test",
-  TestAndHonorDotEnv: "TestAndHonorDotEnv",
+  TestAndHonorNodeEnv: "TestAndHonorNodeEnv",
 } as const;
 
 const Delimiter = "." as const;

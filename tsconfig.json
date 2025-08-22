@@ -1,13 +1,14 @@
 {
   "extends": "@bonniernews/tsconfig",
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noErrorTruncation": true,
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true
   },
-  "lib": ["ES2022"],
-  "include": ["lib/**/*", "scripts", "test"],
+  "include": ["eslint.config.js", "lib/**/*", "scripts", "test"],
   "exclude": ["**/dist/**/*", "**/node_modules/**/*"]
 }

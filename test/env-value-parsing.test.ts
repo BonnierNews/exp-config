@@ -1,4 +1,4 @@
-import process from "process";
+import process from "node:process";
 
 import { getConfigFromDistEsm } from "./helpers/esm-config.js";
 

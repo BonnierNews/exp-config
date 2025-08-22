@@ -27,9 +27,9 @@ function readJson <T extends Record<string, unknown>>(arg: string): T | null {
   }
 }
 
-function writeRecursively(arg: string, content: string): void {
+function writeRecursively(arg: string, content: string | Uint8Array): void {
   fs.mkdirSync(path.dirname(arg), { recursive: true });
-  fs.writeFileSync(arg, content, "utf8");
+  fs.writeFileSync(arg, content);
 }
 
 async function copyRecursively({ source, destination }: {source: string, destination: string}) {

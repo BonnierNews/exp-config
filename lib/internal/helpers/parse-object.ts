@@ -1,5 +1,5 @@
 import { Delimiter } from "../constants.js";
-import unflattenObject from "../../helpers/unflatten-object.js";
+import { unflattenObject } from "../../helpers/unflatten-object.js";
 import type { ApiArgs } from "../../create-config.js";
 
 const parseObject = (params: ApiArgs & {

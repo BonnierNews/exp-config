@@ -5,34 +5,28 @@ import { parse } from "dotenv";
 import { Env, Delimiter, Build } from "./internal/constants.js";
 import { parseObject } from "./internal/helpers/parse-object.js";
 import { readFileSync, readJs, readJson } from "./internal/helpers/fs.js";
-import flattenObject, { type FlattenObject } from "./helpers/flatten-object.js";
-import sortObject from "./helpers/sort-object.js";
+import { flattenObject, type FlattenObject } from "./helpers/flatten-object.js";
+import { sortObject } from "./helpers/sort-object.js";
 
 const customMerge = deepmergeCustom({ mergeArrays: false });
 
 /**
- * Returns an object with two properties: `config` the environment configuration and `flatConfig` a flattened version of the environment configuration
- * ```js
- * import createEnvConfig from "exp-config/create-config.js";
+ * Creates an environment config object from JSON configuration files.
  *
- * const results = createEnvConfig();
+ * Returns an object with the properties:
  *
- * console.log(results);
+ * `config`: the parsed environment configuration
  *
- *  * {
- *  *   config: {
- *  *     envName: "development",
- *  *     foo: { "bar": 1 },
- *  *   }
- *  *   flatConfig: {
- *  *     "config.envName": "development",
- *  *     "config.foo.bar": 1,
- *  *   }
- *  * }
+ * `flatConfig`: a flattened version of the environment configuration
+ *
+ * ```ts
+ * import createConfig from "exp-config/create-config";
+ *
+ * createConfig(); // {  config: { envName: "development" }, flatConfig: { "envName": "development" } }
  * ```
-* @since v5.0.0
+ * @since v5.0.0
  */
-function createEnvConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
+function createConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
   "allowTestEnvOverride" |
   "basePath" |
   "configToMerge" |
@@ -56,7 +50,7 @@ function createEnvConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
 
   const build = [
     envName === Env.Test && !allowTestEnvOverride && Build.Test,
-    envName === Env.Test && allowTestEnvOverride && Build.TestAndHonorDotEnv,
+    envName === Env.Test && allowTestEnvOverride && Build.TestAndHonorNodeEnv,
   ].filter(Boolean)[0] || Build.Default;
 
   const file = {
@@ -84,7 +78,7 @@ function createEnvConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
       break;
     }
     case Build.Default:
-    case Build.TestAndHonorDotEnv: {
+    case Build.TestAndHonorNodeEnv: {
       const allowedKeys = new Set<string>([
         Object.keys(defaultConfig),
         Object.keys(flattenObject((defaultConfig), delimiter)),
@@ -99,7 +93,7 @@ function createEnvConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
       });
 
       switch (build) {
-        case Build.TestAndHonorDotEnv: {
+        case Build.TestAndHonorNodeEnv: {
           config = customMerge(
             defaultConfig,
             nodeEnvObj.allow,
@@ -159,6 +153,7 @@ type Config<T extends Record<string, unknown>> = { envName: string } & T
 export type {
   ApiArgs,
   Config,
+  FlattenObject,
 };
 
-export default createEnvConfig;
+export { createConfig };

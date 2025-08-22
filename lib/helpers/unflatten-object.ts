@@ -1,27 +1,17 @@
 import { Delimiter } from "../internal/constants.js";
 
 /**
- * Unflattens an object
- * Parameters `delimiter`
+ * Unflattens an object into a nested structure.
  *
- * ```js
- * import unflattenObject from "exp-config/helpers/unflatten-object.js";
+ * The `delimiter` parameter is optional and defaults to `"."`.
  *
- * const results = unflattenObject({
- *   "a.b.a": "",
- *   "a.c.a": "",
- * }, ".");
+ * Example:
+ * ```ts
+ * import { unflattenObject } from "exp-config/helpers/unflatten-object";
  *
- * console.log(results);
- *
- * * {
- * *   a: {
- * *     b: { a: "" },
- * *     c: { a: "" },
- * *   },
- * * }
+ * unflattenObject({ "a.b.c": "" }, ".");  // { a: { b: { c: "" } } }
  * ```
-* @since v5.0.0
+ * @since v5.0.0
  */
 function unflattenObject <T = Record<string, unknown>>(arg: T, delimiter?: string): T {
   return Object.entries(arg as Record<string, unknown>).reduce((results, [ flatKey, value ]) => {
@@ -37,4 +27,4 @@ function unflattenObject <T = Record<string, unknown>>(arg: T, delimiter?: strin
   }, {} as Record<string, unknown>) as T;
 }
 
-export default unflattenObject;
+export { unflattenObject };

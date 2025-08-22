@@ -1,61 +1,62 @@
-import path from "path";
 import ts from "typescript";
 
 /**
- * Returns type declarations for the given obj value
+ * Returns a TypeScript declaration string for a given object.
  *
- * ```js
- * import generateTypeDeclarations from "exp-config/helpers/generate-type-declarations.js";
+ * Peer Dependency: `typescript`
  *
- * const results = generateTypeDeclarations({
- *   obj: {
- *     prop: "value",
- *     level1: { level2: "nested value" },
- *     overridden: "from development.json",
- *   },
- *   name: "development",
- * });
+ * Example: Build a union type that models your application config to enable IntelliSense and compile-time checks.
+ * ```ts
+ * import { createConfig } from "exp-config/create-config";
+ * import { generateTypeDeclarations } from "exp-config/helpers/generate-type-declarations";
  *
- * console.log(results);
+ * const envs = [ "development", "test" ];
+ * const configType = `export type Config = ${envs.map((arg) => `typeof ${arg}`).join(" | ")};\n`;
  *
- *  *  export type DevelopmentType = typeof development;
- *  *  export declare const development: {
- *  *      prop: string;
- *  *      level1: {
- *  *          level2: string;
- *  *      };
- *  *      overridden: string;
- *  *  };
+ * const value = envs.reduce((prev, env) => {
+ *   process.env.NODE_ENV = env;
+ *   return (prev + generateTypeDeclarations(env, createConfig()));
+ * }, configType);
  * ```
-* @since v5.0.0
+ *
+ * Value (_truncated for brevity_)
+ * ```ts
+ * export type Config = typeof development | typeof test;
+ * declare const development: {
+ *   config: {
+ *       developmentService: string;
+ *       envName: string;
+ *   }
+ * };
+ * declare const test: {
+ *   config: {
+ *       envName: string;
+ *       testService: string;
+ *   }
+ * };
+ * ```
+ * @since v5.0.0
  */
-function generateTypeDeclarations(params: {
-  obj: Record<string, unknown>,
-  name: string
-}): string | void {
+function generateTypeDeclarations(name: string, obj: Record<string, unknown>): string {
+  const mockFile = "exp-config.ts";
+  const nodeEnvVarPattern = /^(_|npm|[A-Z])/;
+
   let results = "";
 
-  const typeName = `${params.name[0].toUpperCase()}${params.name.substring(1)}Type`;
-  const mockFile = path.join(process.cwd(), `exp-config-${Math.random().toString(36).substring(2, 15)}.ts`);
+  const host = ts.createCompilerHost({ declaration: true, emitDeclarationOnly: true });
+  const orgReadFile = host.readFile;
+  const orgFileExists = host.fileExists;
 
-  const nodeEnvVarPattern = /^(_|npm|[A-Z])/;
-  try {
-    const config = JSON.stringify(params.obj, (key, value) => !nodeEnvVarPattern.test(key) && value);
-    const content = `export type ${typeName} = typeof ${params.name};  export const ${params.name} = ${config};`;
+  host.fileExists = (file) => file === mockFile || orgFileExists.call(host, file);
+  host.readFile = (file) => file === mockFile
+    ? `const ${name} = ${JSON.stringify(obj, (key, val) => nodeEnvVarPattern.test(key) || typeof val === "function" ? undefined : val)};`
+    : orgReadFile.call(host, file);
 
-    const host = ts.createCompilerHost({ declaration: true, emitDeclarationOnly: true });
-    host.readFile = (fileName) => fileName === mockFile ? content : undefined;
-    host.fileExists = (fileName) => fileName === mockFile;
+  const program = ts.createProgram([ mockFile ], { declaration: true, emitDeclarationOnly: true }, host);
 
-    const program = ts.createProgram([ mockFile ], { declaration: true, emitDeclarationOnly: true }, host);
-    program.emit(program.getSourceFile(mockFile), (_, arg) => {
-      results = arg;
-    });
+  program.emit(program.getSourceFile(mockFile), (_, arg) => (results = arg));
 
-    return results;
-  } catch (error) {
-    console.error("exp-config: Error generating TypeScript declarations:", error); // eslint-disable-line no-console
-  }
+  return results;
 }
 
-export default generateTypeDeclarations;
+export { generateTypeDeclarations };

@@ -48,3 +48,5 @@ yalc.lock
 # Visual Studio Code IDE
 .vscode/
 .history/
+
+dist

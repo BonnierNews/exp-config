@@ -1,29 +1,15 @@
-import isObject from "./is-object.js";
+import { isPlainObject } from "./is-plain-object.js";
 
 /**
- * Flattens an object recursively, converts nested keys into a string key.
- * Parameters `delimiter` and `prefix` can be used to customize the key format.
- * ```js
- * import flattenObject from "exp-config/helpers/flatten-object.js";
+ * Converts nested keys into a single-level object using a delimiter and optional prefix.
  *
- * const results = flattenObject({
- *   a: {
- *      b: { a: "" },
- *      c: { a: "" },
- *    },
- *  },
- *  ".",
- *  "prefix"
- * );
+ * Example:
+ * ```ts
+ * import { flattenObject } from "exp-config/helpers/flatten-object";
  *
- * console.log(results);
- *
- *    * {
- *    *   "prefix.a.b.a": "",
- *    *   "prefix.a.c.a": ""
- *    * }
+ * flattenObject({ a: { b: { c: "" } } }, ".", "root") // { "root.a.b.c": "" }
  * ```
-* @since v5.0.0
+ * @since v5.0.0
  */
 function flattenObject<T extends Record<string, unknown>, D extends string = ".", P extends string = "">(
   obj: T,
@@ -34,7 +20,7 @@ function flattenObject<T extends Record<string, unknown>, D extends string = "."
     const fullKey = (prefix ? `${prefix}${delimiter}${key}` : key) as `${P}${string}${D}${string}`;
     const delim = (delimiter ?? ".") as D;
 
-    if (isObject(value)) {
+    if (isPlainObject(value)) {
       Object.assign(prev, flattenObject(value, delim, fullKey));
     } else prev[fullKey] = value;
 
@@ -42,9 +28,7 @@ function flattenObject<T extends Record<string, unknown>, D extends string = "."
   }, {} as Record<string, unknown>) as FlattenObject<T, D, P>;
 }
 
-export default flattenObject;
-
-export type FlattenObject<T, D extends string = ".", P extends string = ""> = UnionToIntersection<{
+type FlattenObject<T, D extends string = ".", P extends string = ""> = UnionToIntersection<{
   [K in keyof T]: T[K] extends object
     ? T[K] extends any[]
       ? { [Q in `${P}${K & string}`]: T[K] }
@@ -52,4 +36,11 @@ export type FlattenObject<T, D extends string = ".", P extends string = ""> = Un
     : { [Q in `${P}${K & string}`]: T[K] }
 }[keyof T]>;
 
-export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+
+export { flattenObject };
+
+export type {
+  FlattenObject,
+  UnionToIntersection,
+};
