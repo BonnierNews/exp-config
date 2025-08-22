@@ -1,0 +1,14 @@
+{
+  "extends": "@bonniernews/tsconfig",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "noErrorTruncation": true,
+    "checkJs": true,
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": ["eslint.config.js", "lib/**/*", "scripts", "test"],
+  "exclude": ["**/dist/**/*", "**/node_modules/**/*"]
+}

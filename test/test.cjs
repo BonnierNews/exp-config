@@ -1,66 +1,78 @@
+// The CJS test can be removed later, but keeping it for now simplifies the code migration.
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
 require("chai").should();
 
+const tmpRoot = path.resolve(__dirname, "../tmp");
+const appCjsDist = path.resolve(__dirname, "../dist/config.cjs");
+const appCjs = path.resolve(__dirname, "../config.cjs");
+const appTmpRoot = path.join(tmpRoot, "index.cjs");
+const appCjsPackage = path.join(tmpRoot, "package.json");
+
 describe("config", () => {
   before(createTempFiles);
 
+  after(() => {
+    fs.rmSync(tmpRoot, { recursive: true });
+    fs.rmSync(appCjs);
+  });
+
   afterEach(() => {
-    delete require.cache[require.resolve("../index")];
-    delete require.cache[require.resolve("../tmp/index")];
+    delete require.cache[require.resolve(appCjs)];
+    delete require.cache[require.resolve(appTmpRoot)];
     delete require.cache[require.resolve("../config/development")];
     delete require.cache[require.resolve("../config/test")];
   });
 
   it("by default retrives values from properties in development.json", () => {
-    require("../index").should.have.property("prop").equal("value");
+
+    require(appCjs).config.should.have.property("prop").equal("value");
   });
 
   it("retrives values from nested properties", () => {
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("level1");
     config.level1.should.have.property("level2").equal("nested value");
   });
 
   it("retrives values from JSON files specified in the NODE_ENV environment variable", () => {
     process.env.NODE_ENV = "test";
-    require("../index").should.have.property("prop").equal("from test");
+    require(appCjs).config.should.have.property("prop").equal("from test");
     delete process.env.NODE_ENV;
   });
 
   it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable", () => {
     process.env.NODE_ENV = "development";
     process.env.NODE_CONFIG_ENV = "test";
-    require("../index").should.have.property("prop").equal("from test");
+    require(appCjs).config.should.have.property("prop").equal("from test");
     delete process.env.NODE_ENV;
     delete process.env.NODE_CONFIG_ENV;
   });
 
   it("retrives values from JSON files from <app root>/config", () => {
-    require("../tmp/index").should.have.property("prop").equal("value");
+    require(appTmpRoot).config.should.have.property("prop").equal("value");
   });
 
   it("supports overriding values in .env file", () => {
-    require("../index").should.have.property("overridden").equal("from .env");
+    require(appCjs).config.should.have.property("overridden").equal("from .env");
   });
 
   it("parses boolean values from .env file", () => {
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("bool1").equal(true);
     config.should.have.property("bool2").equal(true);
     config.should.have.property("bool3").equal(false);
   });
 
   it("retrives values from .env files from <app root>", () => {
-    require("../tmp/index").should.have.property("overridden").equal("from .env");
+    require(appTmpRoot).config.should.have.property("overridden").equal("from .env");
   });
 
   it("doesn't use values from .env when NODE_ENV=test", () => {
     process.env.NODE_ENV = "test";
-    let config = require("../index");
-    config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("overridden").equal("from test.json");
     delete process.env.NODE_ENV;
   });
@@ -68,8 +80,7 @@ describe("config", () => {
   it("doesn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", () => {
     process.env.NODE_ENV = "test";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
-    let config = require("../index");
-    config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("overridden").equal("from test.json");
     delete process.env.NODE_ENV;
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
@@ -78,7 +89,7 @@ describe("config", () => {
   it("should use ENV_PATH, if set, to load other .env file", () => {
     process.env.NODE_ENV = "development";
     process.env.ENV_PATH = "tmp/.test-env";
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("overridden").equal("from .test-env");
     delete process.env.NODE_ENV;
     delete process.env.ENV_PATH;
@@ -87,7 +98,7 @@ describe("config", () => {
   it("should still use ENV_PATH even if it points to a non existent file", () => {
     process.env.NODE_ENV = "development";
     process.env.ENV_PATH = "file-that-doesnt-exist";
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("overridden").equal("from development.json");
     delete process.env.NODE_ENV;
     delete process.env.ENV_PATH;
@@ -95,26 +106,26 @@ describe("config", () => {
 
   it("parses boolean values from environment variables", () => {
     process.env.BOOL_TEST = "true";
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("BOOL_TEST").equal(true);
     delete process.env.BOOL_TEST;
   });
 
   it("supports overriding values with environment variables", () => {
     process.env.prop = "from environment variable";
-    require("../index").should.have.property("prop").equal("from environment variable");
+    require(appCjs).config.should.have.property("prop").equal("from environment variable");
     delete process.env.prop;
   });
 
   it("gives precedence to environment variables over .env", () => {
     process.env.overridden = "from environment variable";
-    require("../index").should.have.property("overridden").equal("from environment variable");
+    require(appCjs).config.should.have.property("overridden").equal("from environment variable");
   });
 
   it("doesn't use environment variables when NODE_ENV=test", () => {
     process.env.NODE_ENV = "test";
     process.env.overridden = "from environment variable";
-    require("../index").should.have.property("overridden").equal("from test.json");
+    require(appCjs).config.should.have.property("overridden").equal("from test.json");
     delete process.env.NODE_ENV;
     delete process.env.overridden;
   });
@@ -123,7 +134,7 @@ describe("config", () => {
     process.env.NODE_ENV = "test";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     process.env.overridden = "from environment variable";
-    require("../index").should.have.property("overridden").equal("from environment variable");
+    require(appCjs).config.should.have.property("overridden").equal("from environment variable");
     delete process.env.NODE_ENV;
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
@@ -131,7 +142,7 @@ describe("config", () => {
 
   it("supports reading config from a custom base path", () => {
     process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.should.have.property("prop").equal("from custom");
     config.should.have.property("overridden").equal("from .env");
     delete process.env.NODE_ENV;
@@ -146,7 +157,7 @@ describe("config", () => {
     const tempPath = path.join(__dirname, "../tmp/config/default.json");
     fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
     // init config
-    const config = require("../index");
+    const config = require(appCjs).config;
     config.prop.should.eql("from custom");
     config.overridden.should.eql("from .env");
     config.newProp.should.eql(true);
@@ -156,8 +167,8 @@ describe("config", () => {
   it("should support a prefix for bash variables", () => {
     process.env.ENV_PREFIX = "MY_ENV_";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
-    process.env.MY_ENV_overridden = "from environment variable"; // eslint-disable-line camelcase
-    const conf = require("../index");
+    process.env.MY_ENV_overridden = "from environment variable";
+    const conf = require(appCjs).config;
     conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
     conf.should.have.property("overridden").equal("from environment variable");
     delete process.env.NODE_ENV;
@@ -180,23 +191,23 @@ describe("config", () => {
 
     it("should replace dots the given char in INTERPRET_CHAR_AS_DOT", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
-      process.env.nested_prop = "from environment variable"; // eslint-disable-line camelcase
-      const conf = require("../index");
+      process.env.nested_prop = "from environment variable";
+      const conf = require(appCjs).config;
       conf.nested.prop.should.eql("from environment variable");
       conf.should.not.have.property("nested_prop").equal("from environment variable");
     });
 
     it("should replace dots the given char in INTERPRET_CHAR_AS_DOT multiple times", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
-      process.env.nested_nested_prop = "from environment variable"; // eslint-disable-line camelcase
-      const conf = require("../index");
+      process.env.nested_nested_prop = "from environment variable";
+      const conf = require(appCjs).config;
       conf.nested.nested.prop.should.eql("from environment variable");
       conf.should.not.have.property("nested_nested_prop").equal("from environment variable");
     });
 
     it("should not replace variables in config file", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
-      const conf = require("../index");
+      const conf = require(appCjs).config;
       conf.should.not.have.property("nested_prop");
       conf.nested.prop.should.eql(true);
     });
@@ -205,8 +216,8 @@ describe("config", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.ENV_PREFIX = "MY_ENV_";
       process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
-      process.env.MY_ENV_nested_prop = "from environment variable"; // eslint-disable-line camelcase
-      const conf = require("../index");
+      process.env.MY_ENV_nested_prop = "from environment variable";
+      const conf = require(appCjs).config;
       conf.nested.prop.should.eql("from environment variable");
       conf.should.not.have.property("MY_ENV_nested_prop").equal("from environment variable");
       conf.should.not.have.property("nested_prop").equal("from environment variable");
@@ -214,8 +225,8 @@ describe("config", () => {
 
     it("should only replace values that exists in config file", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
-      process.env.nested_prop2 = "from environment variable"; // eslint-disable-line camelcase
-      const conf = require("../index");
+      process.env.nested_prop2 = "from environment variable";
+      const conf = require(appCjs).config;
       conf.nested.should.not.have.property("prop2").equal("from environment variable");
       conf.should.have.property("nested_prop2").equal("from environment variable");
     });
@@ -223,8 +234,8 @@ describe("config", () => {
     it("dots should have precedence over INTERPRET_CHAR_AS_DOT", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env["nested.prop"] = "baz";
-      process.env.nested_prop = "foo"; // eslint-disable-line camelcase
-      const conf = require("../index");
+      process.env.nested_prop = "foo";
+      const conf = require(appCjs).config;
       conf.nested.prop.should.equal("baz");
       delete process.env["nested.prop"];
     });
@@ -233,7 +244,7 @@ describe("config", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
       process.env.NODE_ENV = "development";
       process.env.ENV_PATH = "tmp/.test-nested-env";
-      const config = require("../index");
+      const config = require(appCjs).config;
       config.nested.should.have.property("prop").equal("from .test-nested-env");
       delete process.env.NODE_ENV;
       delete process.env.ENV_PATH;
@@ -252,13 +263,13 @@ describe("config", () => {
 
     it("retrives values from .js files specified in the NODE_ENV environment variable", () => {
       // init config
-      const config = require("../index");
+      const config = require(appCjs).config;
       config.level1.should.have.property("prop").equal("config");
       config.level1.should.have.property("array").eql([ "config" ]);
     });
 
     describe("default file in .js", () => {
-      let tempPath;
+      let tempPath = "";
 
       afterEach(() => {
         delete require.cache[require.resolve("../tmp/js-base-path/config/default")];
@@ -270,7 +281,7 @@ describe("config", () => {
         tempPath = path.join(__dirname, "../tmp/js-base-path/config/default.js");
         fs.writeFileSync(tempPath, "module.exports = { newJsProp: true };");
         // init config
-        const config = require("../index");
+        const config = require(appCjs).config;
         config.prop.should.eql("from config");
         config.newJsProp.should.eql(true);
       });
@@ -283,7 +294,7 @@ describe("config", () => {
           'module.exports = { level1: { array: ["default"], level2: { default: true } } };'
         );
         // init config
-        const config = require("../index");
+        const config = require(appCjs).config;
         config.level1.should.have.property("level2").eql({
           default: true,
           config: true,
@@ -294,10 +305,14 @@ describe("config", () => {
   });
 });
 
+/**
+ * @param {string} dir
+ */
 function createFolder(dir) {
   try {
     fs.mkdirSync(path.join(__dirname, dir));
   } catch (e) {
+    // @ts-ignore
     if (e.code !== "EEXIST") throw e;
   }
 }
@@ -308,9 +323,12 @@ function createTempFiles() {
   createFolder("../tmp/js-base-path");
   createFolder("../tmp/js-base-path/config");
 
-  let originalPath = path.join(__dirname, "../index.js");
-  let tempPath = path.join(__dirname, "../tmp/index.js");
-  fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+  fs.cpSync(appCjsDist, appCjs);
+  fs.writeFileSync(appCjsPackage, "{  \"type\": \"commonjs\" }");
+
+  let originalPath = path.join(appCjs);
+  let tempPath;
+  fs.writeFileSync(appTmpRoot, fs.readFileSync(originalPath));
 
   originalPath = path.join(__dirname, "../config/template.json");
   tempPath = path.join(__dirname, "../tmp/config/development.json");
