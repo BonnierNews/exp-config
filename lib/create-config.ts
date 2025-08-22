@@ -26,16 +26,7 @@ const customMerge = deepmergeCustom({ mergeArrays: false });
  * ```
  * @since v5.0.0
  */
-function createConfig<T extends Record<string, unknown>>(args?: Pick<ApiArgs,
-  "allowTestEnvOverride" |
-  "basePath" |
-  "configToMerge" |
-  "delimiter" |
-  "envName" |
-  "envPath" |
-  "envPrefix" |
-  "interpretCharAsDot"
->): {
+function createConfig<T extends Record<string, unknown>>(args?: ApiArgs): {
   flatConfig: FlattenObject<T>,
   config: Config<T>
 } {
@@ -142,10 +133,10 @@ interface ApiArgs {
   basePath?: string
   configToMerge?: Record<string, unknown>
   delimiter?: string,
-  interpretCharAsDot?: string
-  envPath?: string
   envName?: string
+  envPath?: string
   envPrefix?: string
+  interpretCharAsDot?: string
 }
 
 type Config<T extends Record<string, unknown>> = { envName: string } & T

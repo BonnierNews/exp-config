@@ -80,7 +80,7 @@ describe("helper fn generateTypeDeclarations()", () => {
       input: { name: "config", obj: { UPPERCASE: "remove", _underscore: "remove", npm: "remove", keep: 1 } },
     },
   ].forEach((params) => {
-    it(`should generate declaration for object ${params.desc}`, () => {
+    it(`should generate declaration for ${params.desc}`, () => {
       const result = generateTypeDeclarations(params.input.name, params.input.obj).replace(/\s+/g, " ").trim();
       expect(result).to.include(params.expect);
     });
