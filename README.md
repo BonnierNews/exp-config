@@ -2,7 +2,7 @@
 
 ![](https://github.com/ExpressenAB/exp-config/workflows/Run%20tests/badge.svg)
 
-Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
+Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded, and must be set explicitly — `exp-config` throws if no environment is given. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
 
 It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
 
@@ -11,6 +11,17 @@ You should use this module instead of using if/switch statements and the `NODE_E
 # NPM Versions
 
 For node versions below 4 please use v1.3.4 - `npm i -S exp-config@1.3.4`.
+
+## Upgrading to 5.x
+
+Version 5.0.0 removed the implicit `development` default: the environment must now be set explicitly via `NODE_ENV` or `NODE_CONFIG_ENV`, and `exp-config` throws when neither is set. If you relied on the default, set `NODE_ENV=development` where you start your app locally, for example in your npm scripts:
+
+```json
+"scripts": {
+  "start": "NODE_ENV=development node app.js",
+  "test": "NODE_ENV=test mocha"
+}
+```
 
 ## Basic usage
 
@@ -31,6 +42,12 @@ In your code require `exp-config` and retrieve the configuration value:
 ```javascript
 const config = require("exp-config");
 const configuredValue = config.someProp;
+```
+
+Start your app with the environment set, so that `exp-config` knows which file to load:
+
+```
+$ NODE_ENV=development node app.js
 ```
 
 You can also nest properties in the configuration files:
@@ -61,13 +78,21 @@ This is to prevent `config.flags.someFlag` having the value `"false"` (which is 
 
 ## Different configuration files for different environments
 
-By default exp-config loads `<app_root>/config/development.json`. This behavior is typically used for local development and changed by specifying a different environment using the `NODE_ENV` environment variable, like this:
+The environment must always be set explicitly, using either the `NODE_ENV` or the `NODE_CONFIG_ENV` environment variable:
 
 ```
 $ NODE_ENV=production node app
 ```
 
-When starting an application in this way `exp-config` will instead load `<app_root>/config/production.json`. Likewise, it's common to have a separate configuration file for tests, and use `NODE_ENV=test` when running them.
+When starting an application in this way `exp-config` loads `<app_root>/config/production.json`. For local development you set `NODE_ENV=development` to load `<app_root>/config/development.json`. Likewise, it's common to have a separate configuration file for tests, and use `NODE_ENV=test` when running them.
+
+If neither `NODE_ENV` nor `NODE_CONFIG_ENV` is set, `exp-config` throws when it is required:
+
+```
+Error: exp-config: environment must be explicitly set via NODE_CONFIG_ENV or NODE_ENV
+```
+
+This is deliberate: an application should never silently fall back to another environment's configuration.
 
 ### NODE_CONFIG_ENV
 
@@ -159,7 +184,7 @@ An application using `exp-config` typically have a directory structure like this
 .
 ├── .env <-- Overrides for local development, not committed to source control
 ├── config <-- Configuration files committed to source control
-|   ├── development.json <-- used during local development, loaded if NODE_ENV is unset
+|   ├── development.json <-- used during local development by setting NODE_ENV
 |   ├── production.json <-- used in production by setting NODE_ENV
 |   └── test.json <-- used in tests by setting NODE_ENV
 |   └── default.json <-- shared settings, optional

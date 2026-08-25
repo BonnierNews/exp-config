@@ -2,7 +2,11 @@
 
 const fs = require("fs");
 const path = require("path");
+const { expect } = require("chai");
 require("chai").should();
+
+// exp-config requires an explicit environment, so set one for the whole test run
+process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
 describe("config", () => {
   before(createTempFiles);
@@ -14,7 +18,7 @@ describe("config", () => {
     delete require.cache[require.resolve("../config/test")];
   });
 
-  it("by default retrives values from properties in development.json", () => {
+  it("retrives values from properties in development.json when NODE_ENV=development", () => {
     require("../index").should.have.property("prop").equal("value");
   });
 
@@ -27,15 +31,40 @@ describe("config", () => {
   it("retrives values from JSON files specified in the NODE_ENV environment variable", () => {
     process.env.NODE_ENV = "test";
     require("../index").should.have.property("prop").equal("from test");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
   });
 
   it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable", () => {
     process.env.NODE_ENV = "development";
     process.env.NODE_CONFIG_ENV = "test";
     require("../index").should.have.property("prop").equal("from test");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.NODE_CONFIG_ENV;
+  });
+
+  describe("explicit environment", () => {
+    afterEach(() => {
+      process.env.NODE_ENV = "development";
+      delete process.env.NODE_CONFIG_ENV;
+    });
+
+    it("throws when neither NODE_CONFIG_ENV nor NODE_ENV is set", () => {
+      delete process.env.NODE_ENV;
+      delete process.env.NODE_CONFIG_ENV;
+      expect(() => require("../index")).to.throw(/must be explicitly set/);
+    });
+
+    it("throws when NODE_ENV is an empty string", () => {
+      process.env.NODE_ENV = "";
+      delete process.env.NODE_CONFIG_ENV;
+      expect(() => require("../index")).to.throw(/must be explicitly set/);
+    });
+
+    it("doesn't throw when only NODE_CONFIG_ENV is set", () => {
+      delete process.env.NODE_ENV;
+      process.env.NODE_CONFIG_ENV = "test";
+      require("../index").should.have.property("envName").equal("test");
+    });
   });
 
   it("retrives values from JSON files from <app root>/config", () => {
@@ -62,7 +91,7 @@ describe("config", () => {
     let config = require("../index");
     config = require("../index");
     config.should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
   });
 
   it("doesn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", () => {
@@ -71,7 +100,7 @@ describe("config", () => {
     let config = require("../index");
     config = require("../index");
     config.should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });
 
@@ -80,7 +109,7 @@ describe("config", () => {
     process.env.ENV_PATH = "tmp/.test-env";
     const config = require("../index");
     config.should.have.property("overridden").equal("from .test-env");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.ENV_PATH;
   });
 
@@ -89,7 +118,7 @@ describe("config", () => {
     process.env.ENV_PATH = "file-that-doesnt-exist";
     const config = require("../index");
     config.should.have.property("overridden").equal("from development.json");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.ENV_PATH;
   });
 
@@ -115,7 +144,7 @@ describe("config", () => {
     process.env.NODE_ENV = "test";
     process.env.overridden = "from environment variable";
     require("../index").should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.overridden;
   });
 
@@ -124,7 +153,7 @@ describe("config", () => {
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     process.env.overridden = "from environment variable";
     require("../index").should.have.property("overridden").equal("from environment variable");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
   });
@@ -134,7 +163,7 @@ describe("config", () => {
     const config = require("../index");
     config.should.have.property("prop").equal("from custom");
     config.should.have.property("overridden").equal("from .env");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.overridden;
   });
 
@@ -160,7 +189,7 @@ describe("config", () => {
     const conf = require("../index");
     conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
     conf.should.have.property("overridden").equal("from environment variable");
-    delete process.env.NODE_ENV;
+    process.env.NODE_ENV = "development";
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
     delete process.env.MY_ENV_overridden; // jshint ignore:line
@@ -171,7 +200,7 @@ describe("config", () => {
     afterEach(() => {
       delete process.env.INTERPRET_CHAR_AS_DOT;
       delete process.env.nested_prop;
-      delete process.env.NODE_ENV;
+      process.env.NODE_ENV = "development";
       delete process.env.ALLOW_TEST_ENV_OVERRIDE;
       delete process.env.MY_ENV_nested_prop; // jshint ignore:line
       delete process.env.ENV_PREFIX;
@@ -235,7 +264,7 @@ describe("config", () => {
       process.env.ENV_PATH = "tmp/.test-nested-env";
       const config = require("../index");
       config.nested.should.have.property("prop").equal("from .test-nested-env");
-      delete process.env.NODE_ENV;
+      process.env.NODE_ENV = "development";
       delete process.env.ENV_PATH;
       delete process.env.INTERPRET_CHAR_AS_DOT;
     });
