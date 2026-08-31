@@ -22,7 +22,7 @@ describe("config", () => {
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });
 
-  it("retrives values from properties in development.json when NODE_ENV=development", () => {
+  it("retrieves values from properties in development.json when NODE_ENV=development", () => {
     require("../index").should.have.property("prop").equal("value");
   });
 
