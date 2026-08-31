@@ -26,7 +26,7 @@ describe("config", () => {
     require("../index").should.have.property("prop").equal("value");
   });
 
-  it("trims whitespace from NODE_ENV and NODE_CONFIG_ENV", () => {
+  it("trims whitespace from environment", () => {
     process.env.NODE_ENV = "  development  ";
     require("../index").should.have.property("prop").equal("value");
   });
@@ -44,6 +44,12 @@ describe("config", () => {
 
   it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable", () => {
     process.env.NODE_CONFIG_ENV = "test";
+    require("../index").should.have.property("prop").equal("from test");
+  });
+
+  it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable when NODE_ENV is unset", () => {
+    process.env.NODE_CONFIG_ENV = "test";
+    delete process.env.NODE_ENV;
     require("../index").should.have.property("prop").equal("from test");
   });
 
