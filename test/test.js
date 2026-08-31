@@ -26,6 +26,11 @@ describe("config", () => {
     require("../index").should.have.property("prop").equal("value");
   });
 
+  it("trims whitespace from NODE_ENV and NODE_CONFIG_ENV", () => {
+    process.env.NODE_ENV = "  development  ";
+    require("../index").should.have.property("prop").equal("value");
+  });
+
   it("retrives values from nested properties", () => {
     const config = require("../index");
     config.should.have.property("level1");
@@ -53,6 +58,11 @@ describe("config", () => {
 
     it("throws when NODE_ENV is an empty string", () => {
       process.env.NODE_ENV = "";
+      (() => require("../index")).should.throw(/must be explicitly set/);
+    });
+
+    it("throws when NODE_CONFIG_ENV is only white space", () => {
+      process.env.NODE_CONFIG_ENV = "   ";
       (() => require("../index")).should.throw(/must be explicitly set/);
     });
   });
