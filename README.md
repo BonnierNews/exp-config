@@ -19,7 +19,7 @@ Version 5.0.0 removed the implicit `development` default: the environment must n
 ```json
 {
   "scripts": {
-    "start": "NODE_ENV=development node app.js"
+    "dev": "NODE_ENV=development node app.js"
   }
 }
 ```
