@@ -2,7 +2,7 @@
 
 ![](https://github.com/ExpressenAB/exp-config/workflows/Run%20tests/badge.svg)
 
-Loads configuration from JSON files from a `<app_root>/config` directory. The `NODE_ENV` environment variable determines which configuration file is loaded, and must be set explicitly — `exp-config` throws if no environment is given. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
+Loads configuration from JSON files from a `<app_root>/config` directory. The configuration environment is determined by `NODE_CONFIG_ENV` (if set) or `NODE_ENV`, and must be set explicitly — `exp-config` throws if no environment is given. Settings that are shared between environments can be put in the optional `default.json`. Variables loaded from the environment files take precedence over the default.
 
 It's also possible to override configuration values using a file named `.env` in `<app_root>` and by specifying them as environment variables.
 
