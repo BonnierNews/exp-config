@@ -17,9 +17,11 @@ For node versions below 4 please use v1.3.4 - `npm i -S exp-config@1.3.4`.
 Version 5.0.0 removed the implicit `development` default: the environment must now be set explicitly via `NODE_ENV` or `NODE_CONFIG_ENV`, and `exp-config` throws when neither is set. If you relied on the default, set `NODE_ENV=development` where you start your app locally, for example in your npm scripts:
 
 ```json
-"scripts": {
-  "start": "NODE_ENV=development node app.js",
-  "test": "NODE_ENV=test mocha"
+{
+  "scripts": {
+    "start": "NODE_ENV=development node app.js",
+    "test": "NODE_ENV=test mocha"
+  }
 }
 ```
 
