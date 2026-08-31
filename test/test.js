@@ -29,6 +29,11 @@ describe("config", () => {
   it("trims whitespace from environment", () => {
     process.env.NODE_ENV = "  development  ";
     require("../index").should.have.property("prop").equal("value");
+
+    delete require.cache[require.resolve("../index")];
+    process.env.NODE_ENV = "development";
+    process.env.NODE_CONFIG_ENV = "  test  ";
+    require("../index").should.have.property("prop").equal("from test");
   });
 
   it("retrives values from nested properties", () => {
