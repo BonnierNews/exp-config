@@ -8,13 +8,13 @@ It's also possible to override configuration values using a file named `.env` in
 
 You should use this module instead of using if/switch statements and the `NODE_ENV` environment variable directly. This will make your application easier to configure when it grows.
 
-# NPM Versions
+## Requirements
 
-For node versions below 4 please use v1.3.4 - `npm i -S exp-config@1.3.4`.
+`exp-config` 5.x requires Node.js 14 or later.
 
 ## Upgrading to 5.x
 
-Version 5.0.0 removed the implicit `development` default: the environment must now be set explicitly via `NODE_ENV` or `NODE_CONFIG_ENV`, and `exp-config` throws when neither is set. If you relied on the default, set `NODE_ENV=development` where you start your app locally, for example in your npm scripts:
+Version 5.0.0 requires Node.js 14 or later. It also removed the implicit `development` default: the environment must now be set explicitly via `NODE_ENV` or `NODE_CONFIG_ENV`, and `exp-config` throws when neither is set. If you relied on the default, set `NODE_ENV=development` where you start your app locally, for example in your npm scripts:
 
 ```json
 {
@@ -94,6 +94,8 @@ Error: exp-config: environment must be explicitly set via NODE_CONFIG_ENV or NOD
 ```
 
 This is deliberate: an application should never silently fall back to another environment's configuration.
+
+The value is trimmed before it is used, so an empty or whitespace-only `NODE_ENV` or `NODE_CONFIG_ENV` counts as not set and throws the same error.
 
 ### NODE_CONFIG_ENV
 

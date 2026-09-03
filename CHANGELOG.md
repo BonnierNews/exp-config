@@ -6,6 +6,8 @@
   `NODE_CONFIG_ENV` must now be set explicitly; requiring `exp-config` without an environment
   throws `exp-config: environment must be explicitly set via NODE_CONFIG_ENV or NODE_ENV`.
   If you relied on the default, set `NODE_ENV=development` where you start your app locally.
+- **Breaking:** requires Node.js 14 or later
+- The environment name read from `NODE_CONFIG_ENV` / `NODE_ENV` is trimmed.
 
 ## 4.2.1
 

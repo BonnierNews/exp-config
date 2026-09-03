@@ -71,6 +71,11 @@ describe("config", () => {
       process.env.NODE_CONFIG_ENV = "   ";
       (() => require("../index")).should.throw(/must be explicitly set/);
     });
+
+    it("exposes the trimmed environment name as envName", () => {
+      process.env.NODE_ENV = "  development  ";
+      require("../index").should.have.property("envName").equal("development");
+    });
   });
 
   it("retrives values from JSON files from <app root>/config", () => {
