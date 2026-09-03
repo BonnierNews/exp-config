@@ -5,7 +5,7 @@ const path = require("path");
 const dotenv = require("dotenv");
 const merge = require("lodash.merge");
 
-const envName = (process.env.NODE_CONFIG_ENV || process.env.NODE_ENV || "").trim();
+const envName = (process.env.NODE_CONFIG_ENV || process.env.NODE_ENV)?.trim();
 if (!envName) {
   throw new Error("exp-config: environment must be explicitly set via NODE_CONFIG_ENV or NODE_ENV");
 }
