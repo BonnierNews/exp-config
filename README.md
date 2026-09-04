@@ -14,7 +14,12 @@ You should use this module instead of using if/switch statements and the `NODE_E
 
 ## Upgrading to 5.x
 
-Version 5.0.0 requires Node.js 14 or later. It also removed the implicit `development` default: the environment must now be set explicitly via `NODE_ENV` or `NODE_CONFIG_ENV`, and `exp-config` throws when neither is set. If you relied on the default, set `NODE_ENV=development` where you start your app locally, for example in your npm scripts:
+- Requires Node.js 14 or later.
+- **Breaking:** the implicit `development` fallback is gone. `exp-config` throws unless `NODE_ENV` or `NODE_CONFIG_ENV` is set.
+
+Why: the fallback loaded `.env` (and env var overrides) whenever `NODE_ENV=test` was missing or misspelled when running tests. Since `.env` files commonly point at real services, a misconfigured test run could silently hit production. Failing fast on a missing environment removes that risk.
+
+Migration: set the environment explicitly wherever you start the app, e.g. in npm scripts:
 
 ```json
 {
