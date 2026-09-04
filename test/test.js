@@ -7,15 +7,33 @@ require("chai").should();
 describe("config", () => {
   before(createTempFiles);
 
+  beforeEach(() => {
+    process.env.NODE_ENV = "development";
+  });
+
   afterEach(() => {
     delete require.cache[require.resolve("../index")];
     delete require.cache[require.resolve("../tmp/index")];
     delete require.cache[require.resolve("../config/development")];
     delete require.cache[require.resolve("../config/test")];
+
+    delete process.env.NODE_ENV;
+    delete process.env.NODE_CONFIG_ENV;
+    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });
 
-  it("by default retrives values from properties in development.json", () => {
+  it("retrieves values from properties in development.json when NODE_ENV=development", () => {
     require("../index").should.have.property("prop").equal("value");
+  });
+
+  it("trims whitespace from environment", () => {
+    process.env.NODE_ENV = "  development  ";
+    require("../index").should.have.property("prop").equal("value");
+
+    delete require.cache[require.resolve("../index")];
+    process.env.NODE_ENV = "development";
+    process.env.NODE_CONFIG_ENV = "  test  ";
+    require("../index").should.have.property("prop").equal("from test");
   });
 
   it("retrives values from nested properties", () => {
@@ -27,15 +45,42 @@ describe("config", () => {
   it("retrives values from JSON files specified in the NODE_ENV environment variable", () => {
     process.env.NODE_ENV = "test";
     require("../index").should.have.property("prop").equal("from test");
-    delete process.env.NODE_ENV;
   });
 
   it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable", () => {
-    process.env.NODE_ENV = "development";
     process.env.NODE_CONFIG_ENV = "test";
     require("../index").should.have.property("prop").equal("from test");
+  });
+
+  it("retrives values from JSON files specified in the NODE_CONFIG_ENV environment variable when NODE_ENV is unset", () => {
+    process.env.NODE_CONFIG_ENV = "test";
     delete process.env.NODE_ENV;
-    delete process.env.NODE_CONFIG_ENV;
+    require("../index").should.have.property("prop").equal("from test");
+  });
+
+  describe("explicit environment", () => {
+    beforeEach(() => {
+      delete process.env.NODE_ENV;
+    });
+
+    it("throws when neither NODE_CONFIG_ENV nor NODE_ENV is set", () => {
+      (() => require("../index")).should.throw(/must be explicitly set/);
+    });
+
+    it("throws when NODE_ENV is an empty string", () => {
+      process.env.NODE_ENV = "";
+      (() => require("../index")).should.throw(/must be explicitly set/);
+    });
+
+    it("throws when NODE_CONFIG_ENV is only white space", () => {
+      process.env.NODE_CONFIG_ENV = "   ";
+      (() => require("../index")).should.throw(/must be explicitly set/);
+    });
+
+    it("exposes the trimmed environment name as envName", () => {
+      process.env.NODE_ENV = "  development  ";
+      require("../index").should.have.property("envName").equal("development");
+    });
   });
 
   it("retrives values from JSON files from <app root>/config", () => {
@@ -59,37 +104,28 @@ describe("config", () => {
 
   it("doesn't use values from .env when NODE_ENV=test", () => {
     process.env.NODE_ENV = "test";
-    let config = require("../index");
-    config = require("../index");
+    const config = require("../index");
     config.should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
   });
 
   it("doesn't use values from .env when NODE_ENV=test if ALLOW_TEST_ENV_OVERRIDE is set", () => {
     process.env.NODE_ENV = "test";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
-    let config = require("../index");
-    config = require("../index");
+    const config = require("../index");
     config.should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
-    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
   });
 
   it("should use ENV_PATH, if set, to load other .env file", () => {
-    process.env.NODE_ENV = "development";
     process.env.ENV_PATH = "tmp/.test-env";
     const config = require("../index");
     config.should.have.property("overridden").equal("from .test-env");
-    delete process.env.NODE_ENV;
     delete process.env.ENV_PATH;
   });
 
   it("should still use ENV_PATH even if it points to a non existent file", () => {
-    process.env.NODE_ENV = "development";
     process.env.ENV_PATH = "file-that-doesnt-exist";
     const config = require("../index");
     config.should.have.property("overridden").equal("from development.json");
-    delete process.env.NODE_ENV;
     delete process.env.ENV_PATH;
   });
 
@@ -115,7 +151,6 @@ describe("config", () => {
     process.env.NODE_ENV = "test";
     process.env.overridden = "from environment variable";
     require("../index").should.have.property("overridden").equal("from test.json");
-    delete process.env.NODE_ENV;
     delete process.env.overridden;
   });
 
@@ -124,8 +159,6 @@ describe("config", () => {
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
     process.env.overridden = "from environment variable";
     require("../index").should.have.property("overridden").equal("from environment variable");
-    delete process.env.NODE_ENV;
-    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
   });
 
@@ -134,12 +167,10 @@ describe("config", () => {
     const config = require("../index");
     config.should.have.property("prop").equal("from custom");
     config.should.have.property("overridden").equal("from .env");
-    delete process.env.NODE_ENV;
     delete process.env.overridden;
   });
 
   it("supports a default.json for default config", () => {
-    process.env.NODE_ENV = "development";
     process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
     // create default config file
     const originalPath = path.join(__dirname, "../config/default.json");
@@ -160,8 +191,6 @@ describe("config", () => {
     const conf = require("../index");
     conf.should.not.have.property("MY_ENV_overridden").equal("from environment variable");
     conf.should.have.property("overridden").equal("from environment variable");
-    delete process.env.NODE_ENV;
-    delete process.env.ALLOW_TEST_ENV_OVERRIDE;
     delete process.env.overridden;
     delete process.env.MY_ENV_overridden; // jshint ignore:line
     delete process.env.ENV_PREFIX;
@@ -171,8 +200,6 @@ describe("config", () => {
     afterEach(() => {
       delete process.env.INTERPRET_CHAR_AS_DOT;
       delete process.env.nested_prop;
-      delete process.env.NODE_ENV;
-      delete process.env.ALLOW_TEST_ENV_OVERRIDE;
       delete process.env.MY_ENV_nested_prop; // jshint ignore:line
       delete process.env.ENV_PREFIX;
       delete process.env.nested_prop2;
@@ -231,11 +258,9 @@ describe("config", () => {
 
     it("should use INTERPRET_CHAR_AS_DOT when reading .env file", () => {
       process.env.INTERPRET_CHAR_AS_DOT = "_";
-      process.env.NODE_ENV = "development";
       process.env.ENV_PATH = "tmp/.test-nested-env";
       const config = require("../index");
       config.nested.should.have.property("prop").equal("from .test-nested-env");
-      delete process.env.NODE_ENV;
       delete process.env.ENV_PATH;
       delete process.env.INTERPRET_CHAR_AS_DOT;
     });
@@ -243,11 +268,14 @@ describe("config", () => {
 
   describe("config files in .js", () => {
     before(() => {
-      process.env.NODE_ENV = "livedata";
       process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/js-base-path");
       const originalPath = path.join(__dirname, "../config/template.js");
       const tempPath = path.join(__dirname, "../tmp/js-base-path/config/livedata.js");
       fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
+    });
+
+    beforeEach(() => {
+      process.env.NODE_ENV = "livedata";
     });
 
     it("retrives values from .js files specified in the NODE_ENV environment variable", () => {
