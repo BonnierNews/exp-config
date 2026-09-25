@@ -22,14 +22,12 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Fetch tags
-        run: git fetch --prune --unshallow --tags
-
       - name: Check if package version changed
         id: check_version
         run: |
-          version="v$(cat package.json | jq -r '.version')"
-          if [ $(git tag -l "$version") ]; then
+          name="$(jq -r .name package.json)"
+          version="v$(jq -r .version package.json)"
+          if npm view "$name@$version" &> /dev/null; then
             echo "Tag $version already exists."
           else
             echo "version_tag=$version" >> "$GITHUB_OUTPUT"
