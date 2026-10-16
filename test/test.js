@@ -182,18 +182,22 @@ describe("config", () => {
     config.prop.should.eql("from custom");
     config.overridden.should.eql("from .env");
     config.newProp.should.eql(true);
-    delete process.env.CONFIG_BASE_PATH;
   });
 
   describe("CONFIG_BASE_PATH in the test environment", () => {
     const tempTestConfigPath = path.join(__dirname, "../tmp/config/test.json");
+    const originalWarn = console.warn; // eslint-disable-line no-console
+    let warnings;
 
     beforeEach(() => {
       fs.writeFileSync(tempTestConfigPath, JSON.stringify({ prop: "from custom test" }));
       process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
+      warnings = [];
+      console.warn = (msg) => warnings.push(msg); // eslint-disable-line no-console
     });
 
     afterEach(() => {
+      console.warn = originalWarn; // eslint-disable-line no-console
       delete require.cache[tempTestConfigPath];
       fs.unlinkSync(tempTestConfigPath);
     });
@@ -201,6 +205,20 @@ describe("config", () => {
     it("ignores CONFIG_BASE_PATH when NODE_ENV=test", () => {
       process.env.NODE_ENV = "test";
       require("../index").should.have.property("prop").equal("from test");
+    });
+
+    it("warns when CONFIG_BASE_PATH is ignored", () => {
+      process.env.NODE_ENV = "test";
+      require("../index");
+      warnings.should.have.length(1);
+      warnings[0].should.include("CONFIG_BASE_PATH is ignored");
+    });
+
+    it("uses CONFIG_BASE_PATH when NODE_ENV=test but NODE_CONFIG_ENV is not test", () => {
+      process.env.NODE_ENV = "test";
+      process.env.NODE_CONFIG_ENV = "development";
+      require("../index").should.have.property("prop").equal("from custom");
+      warnings.should.have.length(0);
     });
 
     it("ignores CONFIG_BASE_PATH when NODE_CONFIG_ENV=test", () => {

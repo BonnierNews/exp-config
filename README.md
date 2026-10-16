@@ -176,7 +176,7 @@ By default `exp-config` tries to locate the config folder and the (optional) `.e
 $ CONFIG_BASE_PATH=/home/someuser/myapp/ node /home/someuser/myapp/app.js
 ```
 
-`CONFIG_BASE_PATH` is ignored when the environment is `test`. Then config is always loaded from `process.cwd()`, even if `ALLOW_TEST_ENV_OVERRIDE` is set, so a stray `CONFIG_BASE_PATH` in your shell can't make tests load a different `config/test.json`.
+`CONFIG_BASE_PATH` is ignored when the environment is `test`. Then config is always loaded from `process.cwd()`, even if `ALLOW_TEST_ENV_OVERRIDE` is set, so a stray `CONFIG_BASE_PATH` in your shell can't make tests load a different `config/test.json`. A warning is logged when this happens.
 
 ## Specifying a bash variable prefix
 
