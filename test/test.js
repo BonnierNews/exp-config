@@ -20,6 +20,7 @@ describe("config", () => {
     delete process.env.NODE_ENV;
     delete process.env.NODE_CONFIG_ENV;
     delete process.env.ALLOW_TEST_ENV_OVERRIDE;
+    delete process.env.CONFIG_BASE_PATH;
   });
 
   it("retrieves values from properties in development.json when NODE_ENV=development", () => {
@@ -184,6 +185,37 @@ describe("config", () => {
     delete process.env.CONFIG_BASE_PATH;
   });
 
+  describe("CONFIG_BASE_PATH in the test environment", () => {
+    const tempTestConfigPath = path.join(__dirname, "../tmp/config/test.json");
+
+    beforeEach(() => {
+      fs.writeFileSync(tempTestConfigPath, JSON.stringify({ prop: "from custom test" }));
+      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/");
+    });
+
+    afterEach(() => {
+      delete require.cache[tempTestConfigPath];
+      fs.unlinkSync(tempTestConfigPath);
+    });
+
+    it("ignores CONFIG_BASE_PATH when NODE_ENV=test", () => {
+      process.env.NODE_ENV = "test";
+      require("../index").should.have.property("prop").equal("from test");
+    });
+
+    it("ignores CONFIG_BASE_PATH when NODE_CONFIG_ENV=test", () => {
+      delete process.env.NODE_ENV;
+      process.env.NODE_CONFIG_ENV = "test";
+      require("../index").should.have.property("prop").equal("from test");
+    });
+
+    it("ignores CONFIG_BASE_PATH when NODE_ENV=test even if ALLOW_TEST_ENV_OVERRIDE is set", () => {
+      process.env.NODE_ENV = "test";
+      process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
+      require("../index").should.have.property("prop").equal("from test");
+    });
+  });
+
   it("should support a prefix for bash variables", () => {
     process.env.ENV_PREFIX = "MY_ENV_";
     process.env.ALLOW_TEST_ENV_OVERRIDE = "true";
@@ -268,13 +300,13 @@ describe("config", () => {
 
   describe("config files in .js", () => {
     before(() => {
-      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/js-base-path");
       const originalPath = path.join(__dirname, "../config/template.js");
       const tempPath = path.join(__dirname, "../tmp/js-base-path/config/livedata.js");
       fs.writeFileSync(tempPath, fs.readFileSync(originalPath));
     });
 
     beforeEach(() => {
+      process.env.CONFIG_BASE_PATH = path.join(__dirname, "../tmp/js-base-path");
       process.env.NODE_ENV = "livedata";
     });
 

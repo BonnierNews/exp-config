@@ -10,7 +10,8 @@ if (!envName) {
   throw new Error("exp-config: environment must be explicitly set via NODE_CONFIG_ENV or NODE_ENV");
 }
 
-const basePath = process.env.CONFIG_BASE_PATH || process.cwd();
+// In test, always load config from the project root so a stray CONFIG_BASE_PATH can't swap config
+const basePath = envName === "test" ? process.cwd() : (process.env.CONFIG_BASE_PATH || process.cwd());
 const prefix = process.env.ENV_PREFIX;
 const charToConvert = process.env.INTERPRET_CHAR_AS_DOT;
 let defaultConfig = {};
