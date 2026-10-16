@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Breaking:** `CONFIG_BASE_PATH` is ignored when the environment is `test`. Config is always
+  loaded from `process.cwd()`, so a stray export can't load a different `config/test.json`.
+
 ## 5.0.0
 
 - **Breaking:** removed the implicit `development` default for the environment. `NODE_ENV` or

@@ -160,7 +160,7 @@ Values are loaded with the following precedence:
 
 In other words, environment variables take precedence over `.env` files and configuration files.
 
-_NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) the `.env` file and environment variables are ignored. We want the test process to be as isolated and repeatable as possible, and are therefore minimizing the possibility of sticky human fingers messing with its configuration.
+_NOTE, there is one exception_: When `NODE_ENV` equals `test` (`NODE_ENV=test`) the `.env` file, environment variables and `CONFIG_BASE_PATH` (see [Specifying the root folder](#specifying-the-root-folder)) are ignored. We want the test process to be as isolated and repeatable as possible, and are therefore minimizing the possibility of sticky human fingers messing with its configuration.
 
 _NOTE II, exception to the exception_: If you want environment variables to be honored in the `test` environment, you can set the `ALLOW_TEST_ENV_OVERRIDE` environment variable. This is useful for overriding certain configurations when doing in-container testing. The `.env` file will still be ignored however.
 
@@ -175,6 +175,8 @@ By default `exp-config` tries to locate the config folder and the (optional) `.e
 ```
 $ CONFIG_BASE_PATH=/home/someuser/myapp/ node /home/someuser/myapp/app.js
 ```
+
+`CONFIG_BASE_PATH` is ignored when the environment is `test`. Then config is always loaded from `process.cwd()`, even if `ALLOW_TEST_ENV_OVERRIDE` is set, so a stray `CONFIG_BASE_PATH` in your shell can't make tests load a different `config/test.json`. A warning is logged when this happens.
 
 ## Specifying a bash variable prefix
 
